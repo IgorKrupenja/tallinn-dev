@@ -12,10 +12,10 @@ Update event labels and links in the Estonia IT Events Coda table.
 **ALWAYS load environment variables first:**
 
 ```bash
-export $(grep -v '^#' /Users/igor/.claude/skills/.env | xargs)
+export $(grep -v '^#' "$HOME/.claude/skills/.env" | xargs)
 ```
 
-Note: `source` does not reliably export variables into Bash subshells; use `export` instead.
+Note: Uses `$HOME` so it works regardless of which directory Claude Code is opened from.
 
 Required env vars:
 

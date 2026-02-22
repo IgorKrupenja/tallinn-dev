@@ -9,10 +9,10 @@ Add new events to Igor's "Estonia IT Events" Google Calendar with full content e
 
 ## Prerequisites
 
-**ALWAYS source environment variables first:**
+**ALWAYS load environment variables first:**
 
 ```bash
-source /Users/igor/.claude/skills/.env
+export $(grep -v '^#' "$HOME/.claude/skills/.env" | xargs)
 ```
 
 Required env vars:
