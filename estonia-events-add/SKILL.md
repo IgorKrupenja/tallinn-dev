@@ -12,7 +12,7 @@ Add new events to Igor's "Estonia IT Events" Google Calendar with full content e
 **ALWAYS load environment variables first:**
 
 ```bash
-export $(grep -v '^#' "$HOME/.claude/skills/.env" | xargs)
+export $(grep -v '^#' "${SKILLS_DIR:-$HOME/.claude/skills}/.env" | xargs)
 ```
 
 Required env vars:

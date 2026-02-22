@@ -12,10 +12,10 @@ Update event labels and links in the Estonia IT Events Coda table.
 **ALWAYS load environment variables first:**
 
 ```bash
-export $(grep -v '^#' "$HOME/.claude/skills/.env" | xargs)
+export $(grep -v '^#' "${SKILLS_DIR:-$HOME/.claude/skills}/.env" | xargs)
 ```
 
-Note: Uses `$HOME` so it works regardless of which directory Claude Code is opened from.
+Note: Uses `$SKILLS_DIR` env var (set in `.env`) with a fallback to `$HOME/.claude/skills`. Change `SKILLS_DIR` in `.env` to use with other AI tools (e.g. Cursor).
 
 Required env vars:
 
