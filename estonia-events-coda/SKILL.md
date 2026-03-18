@@ -25,7 +25,22 @@ Required env vars:
 
 ## Workflow
 
-### 0. Auto-Archive Past Events (Run This First!)
+### 0. Trigger Google Calendar Sync in Coda (Run This First!)
+
+The Coda table syncs from Google Calendar, but it does not auto-refresh. You must manually trigger a sync before working with the data.
+
+1. Open the Coda page in the Playwright browser:
+   ```
+   browser_navigate to: https://coda.io/d/Estonia-IT-events_dzkj730WT5a/
+   ```
+2. Take a snapshot and find the **Refresh** button (near the table header, next to the search icon).
+3. Click the **Refresh** button.
+4. The sync can take up to a couple of minutes. Take periodic snapshots to check progress — look for the status message (e.g. "Getting updates from Google Calendar...") to disappear and confirm new events have appeared in the table.
+5. Once the sync is complete, proceed to the next steps.
+
+**Note:** There is no API-based way to trigger this sync — the browser click is the only option.
+
+### 1. Auto-Archive Past Events
 
 Automatically mark past events as archived to keep the working set small:
 
@@ -36,7 +51,7 @@ QUERY=$(printf '"Archived":false' | jq -sRr @uri)
 curl -s -H "Authorization: Bearer $CODA_API_TOKEN" \
   "https://coda.io/apis/v1/docs/$CODA_DOC_ID/tables/$CODA_TABLE_ID/rows?useColumnNames=true&query=$QUERY" \
   | jq -r '
-    .items[] 
+    .items[]
     | select(.values.End < "'$(date -I)'")
     | {
         id: .id,
@@ -66,7 +81,7 @@ curl -s -X PUT \
 
 **Note:** This keeps the API response small by filtering archived events server-side.
 
-### 1. Fetch Events Missing Labels or Links
+### 2. Fetch Events Missing Labels or Links
 
 Get non-archived events that are missing either Labels OR Links:
 
@@ -77,9 +92,9 @@ QUERY=$(printf '"Archived":false' | jq -sRr @uri)
 curl -s -H "Authorization: Bearer $CODA_API_TOKEN" \
   "https://coda.io/apis/v1/docs/$CODA_DOC_ID/tables/$CODA_TABLE_ID/rows?useColumnNames=true&query=$QUERY" \
   | jq -r '
-    .items[] 
+    .items[]
     | select(
-        ((.values.Labels == "" or .values.Labels == null) or 
+        ((.values.Labels == "" or .values.Labels == null) or
          (.values.Link == "" or .values.Link == null))
       )
     | .values.Description as $desc
@@ -102,7 +117,7 @@ curl -s -H "Authorization: Bearer $CODA_API_TOKEN" \
 
 **Pro tip:** Most events have the URL as the first line of description - extract and populate the Link field from there!
 
-### 2. Fetch Available Labels
+### 3. Fetch Available Labels
 
 Get the current list of valid labels from Coda:
 
@@ -112,7 +127,7 @@ curl -s -H "Authorization: Bearer $CODA_API_TOKEN" \
   | jq -r '.items[] | select(.name == "Labels") | .format.options[] | .name' | sort
 ```
 
-### 3. Remove "🔥 New" Label (Always Run This!)
+### 4. Remove "🔥 New" Label (Always Run This!)
 
 Remove "🔥 New" from events that were previously labeled (this cleans up old labels):
 
@@ -123,7 +138,7 @@ QUERY=$(printf '"Archived":false' | jq -sRr @uri)
 curl -s -H "Authorization: Bearer $CODA_API_TOKEN" \
   "https://coda.io/apis/v1/docs/$CODA_DOC_ID/tables/$CODA_TABLE_ID/rows?useColumnNames=true&query=$QUERY" \
   | jq -r '
-    .items[] 
+    .items[]
     | select(.values.Labels | contains("New"))
     | {
         id: .id,
@@ -155,7 +170,7 @@ curl -s -X PUT \
 
 **Note:** This step runs EVERY time to clean up "🔥 New" labels from previous runs. Only newly labeled events in step 4 get "🔥 New" added back.
 
-### 4. Manual Labeling Process
+### 5. Manual Labeling Process
 
 **⚠️ Important:**
 
@@ -164,11 +179,11 @@ curl -s -X PUT \
 - **Use judgment** - assign labels based on actual content, not keywords
 - **ALWAYS add "🔥 New"** to the labels when labeling events that were missing labels/links
 
-### 5. Extract URLs from Descriptions
+### 6. Extract URLs from Descriptions
 
 Check the `url_in_description` field from step 1. If present, use it to populate the Link field.
 
-### 6. Update Event Row
+### 7. Update Event Row
 
 Update both Labels and Link fields:
 
@@ -205,6 +220,7 @@ curl -X PUT \
 
 Before updating events:
 
+- ✅ Triggered Google Calendar sync in Coda (browser Refresh) and waited for it to complete
 - ✅ Environment variables sourced
 - ✅ "Archived" column exists in Coda table
 - ✅ Ran auto-archive step to mark past events
@@ -218,6 +234,7 @@ Before updating events:
 
 ## Common Pitfalls
 
+❌ Not triggering Google Calendar sync before starting (data will be stale)
 ❌ Forgetting to run auto-archive step first
 ❌ Missing "Archived" column in Coda table
 ❌ Using keyword matching instead of reading descriptions
