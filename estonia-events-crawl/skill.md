@@ -11,12 +11,16 @@ Discover new IT events by crawling bookmarked event sources. Extracts candidates
 
 **ALWAYS load environment variables first:**
 
+Note: Use `set -a && source ... && set +a` instead of `export $(grep ... | xargs)` because some env vars contain paths with spaces.
+
 ```bash
-export $(grep -v '^#' "${SKILLS_DIR:-$HOME/.claude/skills}/.env" | xargs)
+set -a && source "${SKILLS_DIR:-$HOME/.claude/skills}/.env" && set +a
 ```
 
-Required env vars (same as add/coda skills):
+Required env vars:
 
+- `$BOOKMARKS_FILE` - Path to Chromium bookmarks JSON file
+- `$BOOKMARKS_FOLDER` - Folder path in bookmarks (e.g. `talllinn.dev/Sources`)
 - `$ESTONIA_EVENTS_CALENDAR_ID` - Target calendar ID
 - `$GOPLACES_API_KEY` - Google Places API key
 - `$CODA_API_TOKEN`, `$CODA_DOC_ID`, `$CODA_TABLE_ID` - Coda access
@@ -33,17 +37,23 @@ Required env vars (same as add/coda skills):
 
 ## Step 1: Read Bookmarks
 
-**Read fresh from Vivaldi each time** — the bookmark list is not static, the user adds/removes sources between runs.
+**Read fresh each time** — the bookmark list is not static, the user adds/removes sources between runs.
+
+`$BOOKMARKS_FOLDER` is a `/`-separated path of folder names (e.g. `talllinn.dev/Sources`). Walk into each folder by name:
 
 ```bash
-jq -r '
-  .roots.bookmark_bar.children[]
-  | select(.name == "talllinn.dev")
-  | .children[]
-  | select(.name == "Sources")
-  | .children[]
-  | .url
-' "$HOME/Library/Application Support/Vivaldi/Default/Bookmarks"
+# Build jq filter dynamically from BOOKMARKS_FOLDER (e.g. "talllinn.dev/Sources")
+FILTER=$(python3 -c "
+import os
+folders = os.environ['BOOKMARKS_FOLDER'].split('/')
+f = '.roots.bookmark_bar.children[]'
+for folder in folders:
+    f += f' | select(.name == \"{folder}\") | .children[]'
+f += ' | .url'
+print(f)
+")
+
+jq -r "$FILTER" "$BOOKMARKS_FILE"
 ```
 
 ## Step 2: Crawl Each Source
@@ -88,7 +98,7 @@ candidate = { title, date, url, source_url, location (if available) }
 - **Luma general/discovery pages** (`luma.com/tech`, `luma.com/discover`): Only look at events **within the next 2 weeks** — these pages list global events and get very long.
 - **Facebook groups/feeds**: Scroll down at most 10 scroll iterations.
 - **LinkedIn feeds**: Scroll at most 5 times — these are noisy and most event links appear in recent posts.
-- **K-space** (`wiki.k-space.ee`): Chaostreffs is a valid recurring event (every Thursday). Ensure it's in the calendar up to ~6 months out. Also check for one-off events on the events page.
+- **K-space** (`wiki.k-space.ee`): Chaostreffs is a valid recurring event (every Thursday). Check the wiki page to confirm it's still running, then check the calendar's recurring event RRULE and **extend the UNTIL date to ~6 months from today** if needed (use `gog calendar update` with `--rrule` and `--scope all`). Also check for one-off events on the events page.
 
 ### Handling login walls
 
