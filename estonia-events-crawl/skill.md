@@ -208,7 +208,7 @@ After all events are added, run the `estonia-events-coda` skill to:
 ## Common Pitfalls
 
 - **Dismissing sources after a surface-level scan** — e.g. seeing only today's events on Fienta and giving up, or skipping ECB because it looks like a big table. Dig deeper!
-- **Saving snapshot files to the repo root** — use the `.playwright-mcp/` folder for snapshots (Playwright's default), don't save named snapshots to the working directory
+- **Saving snapshot files to the repo root** — use the `.playwright-mcp/` folder for snapshots (Playwright's default), don't save named snapshots to the working directory. If you need to save named snapshots, use `/tmp/` or another temp folder outside the repo.
 - **Forgetting to check next year** on sources like ECB that list events far in advance
 - **Not including URLs in the candidate table** — user needs URLs to review events
 - **Including expensive training/certification courses** as if they were community events
@@ -219,5 +219,3 @@ After all events are added, run the `estonia-events-coda` skill to:
 - **Only checking the Events tab on Facebook/LinkedIn pages** — some pages post event links in their feed but don't create formal FB/LinkedIn events. Check both the Events tab AND the main feed/posts.
 - Not checking calendar for duplicates before presenting
 - Trying to extract full details during crawl phase (just get links + basic info, full extraction happens in add phase)
-- Spending too long on discovery pages (respect the pagination/scroll limits)
-- Hardcoding source-specific logic instead of reading what's on the page
