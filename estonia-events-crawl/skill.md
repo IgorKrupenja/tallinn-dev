@@ -95,11 +95,16 @@ candidate = { title, date, url, source_url, location (if available) }
 
 ### Pagination and scrolling limits
 
+**IMPORTANT: Do NOT dismiss sources after a surface-level scan. Be thorough — paginate, scroll, and dig into each source.**
+
 - **Default**: Extract what's visible on the first page load. If there's a clear "Show more" or pagination, go up to 3 pages deep.
-- **Eventbrite** (`eventbrite.com`): Paginate through results, but **stop when you start seeing only Helsinki/Finland events** — Eventbrite shows Tallinn results first, then expands to nearby cities.
+- **Eventbrite** (`eventbrite.com`): Paginate through **at least 4 pages** of results. Stop when you start seeing only Helsinki/Finland events. **Ignore paid online courses/workshops** (e.g. ISTQB certification courses costing €1000+). Paid conferences (at any price) are fine if they're real community events.
+- **ECB** (`ecb.ee/calendar`): This is a goldmine of tech conferences. Scan the full table for tech keywords (cyber, digital, AI, startup, blockchain, fintech, smart, IoT, cloud, etc.). **Check both the current year AND the next year** — ECB lists events well in advance. When unsure if an event fits, open its detail page to investigate.
+- **Fienta** (`fienta.com`): Click "Load more" **at least 10 times** to see events up to 2 weeks out. The first page only shows today's events. Scan all loaded events for tech relevance — there are tech events mixed in among cultural ones.
 - **Luma general/discovery pages** (`luma.com/tech`, `luma.com/discover`): Only look at events **within the next 2 weeks** — these pages list global events and get very long.
 - **Facebook groups/feeds**: Scroll down but stop at `last_event_date` from crawl state, or at most 10 scroll iterations if no state exists.
 - **LinkedIn feeds**: Scroll at most 5 times — these are noisy and most event links appear in recent posts.
+- **K-space** (`wiki.k-space.ee`): Chaostreffs is a valid recurring event (every Thursday). Ensure it's in the calendar up to ~6 months out. Also check for one-off events on the events page.
 
 ### Handling login walls
 
@@ -146,12 +151,16 @@ Remove candidates that are NOT IT/tech/startup related. Keep events about:
 - HealthTech, FinTech, EdTech, GreenTech (tech verticals)
 - Blockchain, Web3, crypto
 
+Kids/student tech events (camps, school hackathons) are fine — they get a "student" label in Coda. These are uncommon but valid.
+
 Remove events about:
 
 - Pure business/marketing with no tech angle
 - Concerts, theatre, sports, cooking
 - Non-tech networking
 - Job fairs that aren't tech-specific
+- **Paid training courses** (e.g. ISTQB certification at €1000+, professional certification programs). Paid conferences (€30-€400) are fine if they're real community/industry events.
+- **Paid online-only events** listed on Eventbrite or similar — only include in-person or hybrid events in Estonia
 
 **When in doubt, INCLUDE the candidate** — the user will make the final call.
 
@@ -175,9 +184,9 @@ Also note:
 Format:
 
 ```
-| # | Event | Date | Location | Source |
-|---|-------|------|----------|--------|
-| 1 | ... | ... | ... | ... |
+| # | Event | Date | Location | URL | Source |
+|---|-------|------|----------|-----|--------|
+| 1 | ... | ... | ... | https://... | ... |
 
 ⚠️ Skipped sources (login required):
 - linkedin.com/company/foundmeio/events/ — not logged in
@@ -186,7 +195,7 @@ Format:
 ✅ Crawled: 27/30 sources | ⏭️ Skipped: 3
 ```
 
-Then ask: **"Which events to add?"**
+Then ask: **"Which events to add? (e.g., 1,3,5-8,all)"**
 
 ## Step 6: Add Approved Events
 
@@ -238,3 +247,8 @@ EOF
 - Trying to extract full details during crawl phase (just get links + basic info, full extraction happens in add phase)
 - Spending too long on discovery pages (respect the pagination/scroll limits)
 - Hardcoding source-specific logic instead of reading what's on the page
+- **Dismissing sources after a surface-level scan** — e.g. seeing only today's events on Fienta and giving up, or skipping ECB because it looks like a big table. Dig deeper!
+- **Saving snapshot files to the repo root** — use the `.playwright-mcp/` folder for snapshots (Playwright's default), don't save named snapshots to the working directory
+- **Forgetting to check next year** on sources like ECB that list events far in advance
+- **Not including URLs in the candidate table** — user needs URLs to review events
+- **Including expensive training/certification courses** as if they were community events
