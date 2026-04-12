@@ -159,7 +159,7 @@ Remove events about:
 - Concerts, theatre, sports, cooking
 - Non-tech networking
 - Job fairs that aren't tech-specific
-- **Paid training courses** (e.g. ISTQB certification at €1000+, professional certification programs). Paid conferences (€30-€400) are fine if they're real community/industry events.
+- **Paid training courses** (e.g. ISTQB certification at €1000+, professional certification programs). Paid conferences (at any price) are fine if they're real community/industry events.
 - **Paid online-only events** listed on Eventbrite or similar — only include in-person or hybrid events in Estonia
 
 **When in doubt, INCLUDE the candidate** — the user will make the final call.
@@ -239,6 +239,11 @@ EOF
 
 ## Common Pitfalls
 
+- **Dismissing sources after a surface-level scan** — e.g. seeing only today's events on Fienta and giving up, or skipping ECB because it looks like a big table. Dig deeper!
+- **Saving snapshot files to the repo root** — use the `.playwright-mcp/` folder for snapshots (Playwright's default), don't save named snapshots to the working directory
+- **Forgetting to check next year** on sources like ECB that list events far in advance
+- **Not including URLs in the candidate table** — user needs URLs to review events
+- **Including expensive training/certification courses** as if they were community events
 - Not processing ALL sources before presenting candidates
 - Including non-tech events (general ticketing sites list everything)
 - Not handling login walls gracefully (skip, don't crash)
@@ -247,8 +252,3 @@ EOF
 - Trying to extract full details during crawl phase (just get links + basic info, full extraction happens in add phase)
 - Spending too long on discovery pages (respect the pagination/scroll limits)
 - Hardcoding source-specific logic instead of reading what's on the page
-- **Dismissing sources after a surface-level scan** — e.g. seeing only today's events on Fienta and giving up, or skipping ECB because it looks like a big table. Dig deeper!
-- **Saving snapshot files to the repo root** — use the `.playwright-mcp/` folder for snapshots (Playwright's default), don't save named snapshots to the working directory
-- **Forgetting to check next year** on sources like ECB that list events far in advance
-- **Not including URLs in the candidate table** — user needs URLs to review events
-- **Including expensive training/certification courses** as if they were community events
