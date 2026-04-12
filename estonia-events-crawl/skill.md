@@ -86,6 +86,7 @@ candidate = { title, date, url, source_url, location (if available) }
 - Event card patterns: heading + date + location grouped together
 - For social feeds (FB groups, LinkedIn posts): scan posts for shared event links
 - **Programs, accelerators, and initiatives** (e.g. "ScaleUP Program", "Incubator Batch") — these often have kickoff events, demo days, pitch nights, or application deadlines with public events attached. Follow the link and check for specific dates/events inside.
+- **Job shadow weeks, career days, and open-door events at tech clusters** (e.g. Ülemiste City, Tehnopol) — these are relevant if they take place in a tech/startup hub where the participating companies are predominantly tech companies. Include them even if the event itself isn't strictly "about" technology.
 
 ### Pagination and scrolling limits
 
@@ -99,16 +100,6 @@ candidate = { title, date, url, source_url, location (if available) }
 - **Facebook groups/feeds**: Scroll down at most 10 scroll iterations.
 - **LinkedIn feeds**: Scroll at most 5 times — these are noisy and most event links appear in recent posts.
 - **K-space** (`wiki.k-space.ee`): Chaostreffs is a valid recurring event (every Thursday). Check the wiki page to confirm it's still running, then check the calendar's recurring event RRULE and **extend the UNTIL date to ~6 months from today** if needed (use `gog calendar update` with `--rrule` and `--scope all`). Also check for one-off events on the events page.
-
-### Handling login walls
-
-If a page requires login and you're not logged in:
-
-1. Open the login page in the browser
-2. Ask the user to log in
-3. Wait for confirmation, then continue crawling that source
-
-Do NOT silently skip sources and "report at the end" — that defeats the purpose of crawling.
 
 ## Step 3: Deduplicate
 
@@ -224,6 +215,8 @@ After all events are added, run the `estonia-events-coda` skill to:
 - Not processing ALL sources before presenting candidates
 - Including non-tech events (general ticketing sites list everything)
 - Not handling login walls gracefully (skip, don't crash)
+- **Assuming you're not logged in** to LinkedIn/Discord — the browser session is typically already authenticated. Always try navigating first.
+- **Only checking the Events tab on Facebook/LinkedIn pages** — some pages post event links in their feed but don't create formal FB/LinkedIn events. Check both the Events tab AND the main feed/posts.
 - Not checking calendar for duplicates before presenting
 - Trying to extract full details during crawl phase (just get links + basic info, full extraction happens in add phase)
 - Spending too long on discovery pages (respect the pagination/scroll limits)
