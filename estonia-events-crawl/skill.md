@@ -186,7 +186,7 @@ Format:
 ✅ Crawled: 27/30 sources | ⏭️ Skipped: 3
 ```
 
-Then ask: **"Which events to add? (e.g., 1,3,5-8,all)"**
+Then ask: **"Which events to add?"**
 
 ## Step 6: Add Approved Events
 
