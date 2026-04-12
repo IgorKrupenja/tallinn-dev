@@ -81,6 +81,10 @@ candidate = { title, date, url, source_url, location (if available) }
 4. Look for event listings: titles with dates, links to event detail pages
 5. Extract future events — ignore past ones
 6. If the page has pagination or "load more", scroll/click to get more (see limits below)
+7. **Don't dismiss posts based on post age** — a post from weeks ago may promote an event that's still in the future. Always check the actual event date, not the post/publish date. Click through to the event link if the date isn't clear from the post itself.
+8. **Scroll feeds deeply** — for any feed-style page (FB pages, LinkedIn, groups), scroll **at least 5 times** before moving on. Events are often 3-4 posts down, not at the top. Don't stop after seeing just the first 1-2 posts.
+9. **When unsure if an event fits, open its detail page** to investigate before excluding it.
+10. **Paid conferences are fine** if they're real community/industry events. Only exclude paid online training courses (e.g. ISTQB certification at €1000+).
 
 ### What to look for in snapshots
 
@@ -96,14 +100,37 @@ candidate = { title, date, url, source_url, location (if available) }
 **IMPORTANT: Do NOT dismiss sources after a surface-level scan. Be thorough — paginate, scroll, and dig into each source.**
 
 - **Default**: Extract what's visible on the first page load. If there's a clear "Show more" or pagination, go up to 5 pages deep.
-- **Eventbrite** (`eventbrite.com`): Paginate through **at least 4 pages** of results. Stop when you start seeing only Helsinki/Finland events. **Ignore paid online courses/workshops** (e.g. ISTQB certification courses costing €1000+). Paid conferences (at any price) are fine if they're real community events.
-- **ECB** (`ecb.ee/calendar`): This is a goldmine of tech conferences. Scan the full table for tech keywords (cyber, digital, AI, startup, blockchain, fintech, smart, IoT, cloud, etc.). **Check ALL future years available in the year dropdown** — use the year dropdown at the top of the page and click the search button to switch years. ECB lists events years in advance (2027, 2028, etc.). The goal is to have as many events as possible in the calendar, even far ahead. Each table row has a "WWW" column (3rd column) with a direct link to the event website — **always extract that URL**, don't link to the ECB calendar page itself. When unsure if an event fits, open its detail page to investigate.
-- **Fienta** (`fienta.com`): Click "Load more" **at least 10 times** to see events up to 2 weeks out. The first page only shows today's events. Scan all loaded events for tech relevance — there are tech events mixed in among cultural ones.
-- **Luma general/discovery pages** (`luma.com/tech`, `luma.com/discover`): The 2-week limit applies **only to the global/international event listings** (major events, popular calendars). The **"Nearby Events" section shows local Tallinn events** — extract ALL of them regardless of date, since there are very few. Nearby events render as `button` elements in snapshots without visible hrefs — **extract the `/url:` from the nested `link` element** in the snapshot (e.g. `/url: /yurdrxp2` → `https://luma.com/yurdrxp2`), or click the button to navigate and copy the URL. For **specific Luma calendars** (e.g. `luma.com/EstoniAI`), extract ALL upcoming events — these pages are small. The calendar/timeline section at the bottom also shows events as clickable cards — extract URLs the same way.
-- **Facebook groups/feeds**: Facebook feed content renders as empty `blockquote: Facebook` placeholders in accessibility snapshots — you won't see post text. **Use `browser_take_screenshot` instead** (same approach as Discord) to read the feed visually. Take a screenshot, read the posts from the image, and extract any event links or announcements. Scroll down at most 10 scroll iterations, taking screenshots as needed. For pages with an Events tab, check the Events tab first (accessibility snapshots work there), then **always also check the main feed** via screenshots — some pages post event links in their feed but don't create formal FB events (e.g. EstoniaWEB3, Palo Alto Club). **URL extraction**: event cards in snapshots have truncated titles but include a `link` element with `/url:` — always extract that URL. For feed posts with event links visible only in screenshots, navigate to the post to get the actual URL.
-- **LinkedIn feeds**: Scroll at most 5 times — these are noisy and most event links appear in recent posts. For company pages with an Events tab, check events first, then also scroll the posts feed. LinkedIn accessibility snapshots generally work better than Facebook, but use `browser_take_screenshot` if content appears empty.
-- **K-space** (`wiki.k-space.ee`): Chaostreffs is a valid recurring event (every Thursday). Check the wiki page to confirm it's still running, then check the calendar's recurring event RRULE and **extend the UNTIL date to ~6 months from today** if needed (use `gog calendar update` with `--rrule` and `--scope all`). Also check for one-off events on the events page.
-- **Discord**: Discord is a SPA that renders very poorly in accessibility snapshots — you'll get almost no content. **Use `browser_take_screenshot` instead** to read the channel visually. Take a screenshot, read the messages from the image, and extract any event links or announcements. **If you see an event mentioned in a screenshot, navigate to the linked URL to confirm details** — a screenshot alone is not a substitute for having the actual event URL.
+- **Eventbrite** (`eventbrite.com`):
+  - Paginate through **at least 4 pages** of results
+  - Stop when you start seeing only Helsinki/Finland events
+- **ECB** (`ecb.ee/calendar`): Goldmine of tech conferences.
+  - Scan the full table for tech keywords (cyber, digital, AI, startup, blockchain, fintech, smart, IoT, cloud, etc.)
+  - **Check ALL future years** in the year dropdown — click the search button to switch years. ECB lists events years in advance (2027, 2028, etc.)
+  - Each table row has a "WWW" column (3rd column) with a direct link to the event website — **always extract that URL**, don't link to the ECB calendar page itself
+- **Fienta** (`fienta.com`):
+  - Click "Load more" **at least 10 times** to see events up to 2 weeks out
+  - The first page only shows today's events
+  - Scan all loaded events for tech relevance — tech events are mixed in among cultural ones
+- **Luma** (`luma.com/tech`, `luma.com/discover`, specific calendars):
+  - The 2-week limit applies **only to global/international event listings** (major events, popular calendars)
+  - The **"Nearby Events" section shows local Tallinn events** — extract ALL of them regardless of date, since there are very few
+  - Nearby events render as `button` elements in snapshots without visible hrefs — **extract the `/url:` from the nested `link` element** (e.g. `/url: /yurdrxp2` → `https://luma.com/yurdrxp2`), or click the button to navigate
+  - For **specific Luma calendars** (e.g. `luma.com/EstoniAI`), extract ALL upcoming events — these pages are small
+- **Facebook groups/feeds**:
+  - Feed content renders as empty `blockquote: Facebook` placeholders in accessibility snapshots — **use `browser_take_screenshot` instead** to read the feed visually
+  - For pages with an Events tab, check the Events tab first (snapshots work there), then **always also check the main feed** via screenshots — some pages post event links but don't create formal FB events (e.g. EstoniaWEB3, Palo Alto Club)
+  - **URL extraction**: event cards in snapshots have truncated titles but include a `link` element with `/url:` — always extract that URL. For feed posts with event links visible only in screenshots, navigate to the post to get the actual URL
+- **LinkedIn feeds**:
+  - For every post that mentions an event, check whether the event date is in the future
+  - For company pages with an Events tab, check events first, then also scroll the posts feed
+  - Snapshots generally work better than Facebook, but use `browser_take_screenshot` if content appears empty
+- **K-space** (`wiki.k-space.ee`):
+  - Chaostreffs is a valid recurring event (every Thursday) — check the wiki page to confirm it's still running
+  - Check the calendar's recurring event RRULE and **extend the UNTIL date to ~6 months from today** if needed (use `gog calendar update` with `--rrule` and `--scope all`)
+  - Also check for one-off events on the events page
+- **Discord**: SPA that renders very poorly in accessibility snapshots.
+  - **Use `browser_take_screenshot` instead** to read the channel visually
+  - If you see an event mentioned in a screenshot, **navigate to the linked URL to confirm details** — a screenshot alone is not a substitute for having the actual event URL
 
 ## Step 3: Verify ALL Sources Were Crawled
 
