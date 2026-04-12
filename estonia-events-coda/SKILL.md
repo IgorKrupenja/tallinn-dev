@@ -216,7 +216,7 @@ curl -X PUT \
 
 **Rate limiting:**
 
-- Wait 1-2 seconds between API calls to be nice to Coda
+- Wait **2 seconds** between API calls to avoid Coda rate limiting (1 second is not enough when doing bulk updates)
 
 ## Quality Checklist
 
