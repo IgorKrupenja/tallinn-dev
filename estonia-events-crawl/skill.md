@@ -148,6 +148,8 @@ Remove candidates that are NOT IT/tech/startup related. Keep events about:
 
 Kids/student tech events (camps, school hackathons) are fine — they get a "student" label in Coda. These are uncommon but valid.
 
+**Non-public events are also fine** — university seminars, invite-only meetups, career events at tech companies, etc. Many people can have access to these and they're still valuable to list. Don't filter out events just because they seem "internal" or targeted at a specific audience (students, alumni, employees).
+
 Remove events about:
 
 - Pure business/marketing with no tech angle
