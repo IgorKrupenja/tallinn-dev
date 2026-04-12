@@ -11,8 +11,10 @@ Add new events to Igor's "Estonia IT Events" Google Calendar with full content e
 
 **ALWAYS load environment variables first:**
 
+Note: Use `set -a && source ... && set +a` instead of `export $(grep ... | xargs)` because some env vars contain paths with spaces.
+
 ```bash
-export $(grep -v '^#' "${SKILLS_DIR:-$HOME/.claude/skills}/.env" | xargs)
+set -a && source "${SKILLS_DIR:-$HOME/.claude/skills}/.env" && set +a
 ```
 
 Required env vars:

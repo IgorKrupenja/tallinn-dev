@@ -86,6 +86,7 @@ candidate = { title, date, url, source_url, location (if available) }
 - Date patterns near link text (e.g., "Mar 26", "26.03.2026", "Thursday 2 April")
 - Event card patterns: heading + date + location grouped together
 - For social feeds (FB groups, LinkedIn posts): scan posts for shared event links
+- **Programs, accelerators, and initiatives** (e.g. "ScaleUP Program", "Incubator Batch") — these often have kickoff events, demo days, pitch nights, or application deadlines with public events attached. Follow the link and check for specific dates/events inside.
 
 ### Pagination and scrolling limits
 
@@ -115,7 +116,7 @@ Do NOT silently skip sources and "report at the end" — that defeats the purpos
 After collecting all candidates, check each against the existing calendar:
 
 ```bash
-export $(grep -v '^#' "${SKILLS_DIR:-$HOME/.claude/skills}/.env" | xargs)
+set -a && source "${SKILLS_DIR:-$HOME/.claude/skills}/.env" && set +a
 
 # Check by date range
 gog calendar list "$ESTONIA_EVENTS_CALENDAR_ID" \

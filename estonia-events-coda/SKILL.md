@@ -11,8 +11,10 @@ Update event labels and links in the Estonia IT Events Coda table.
 
 **ALWAYS load environment variables first:**
 
+Note: Use `set -a && source ... && set +a` instead of `export $(grep ... | xargs)` because some env vars contain paths with spaces.
+
 ```bash
-export $(grep -v '^#' "${SKILLS_DIR:-$HOME/.claude/skills}/.env" | xargs)
+set -a && source "${SKILLS_DIR:-$HOME/.claude/skills}/.env" && set +a
 ```
 
 Note: Uses `$SKILLS_DIR` env var (set in `.env`) with a fallback to `$HOME/.claude/skills`. Change `SKILLS_DIR` in `.env` to use with other AI tools (e.g. Cursor).
