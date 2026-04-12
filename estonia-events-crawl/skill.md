@@ -70,7 +70,7 @@ candidate = { title, date, url, source_url, location (if available) }
 
 ### General approach for every source
 
-**NEVER skip sources.** If a page requires login, ask the user to log in. Do not be lazy and assume a source has nothing — every source is bookmarked for a reason.
+**NEVER skip sources — not even if they feel noisy, time-intensive, or you think you already have enough candidates.** Every source is bookmarked for a reason. If a page requires login, ask the user to log in. If a source requires many clicks or scrolls (Fienta, LinkedIn), do the work — that's the whole point of crawling. "I have 30 candidates already" is NOT a reason to skip remaining sources.
 
 1. Navigate to the URL in browser
 2. Handle cookie banners / popups (dismiss them)
@@ -88,7 +88,7 @@ candidate = { title, date, url, source_url, location (if available) }
 - **Programs, accelerators, and initiatives** (e.g. "ScaleUP Program", "Incubator Batch") — these often have kickoff events, demo days, pitch nights, or application deadlines with public events attached. Follow the link and check for specific dates/events inside.
 - **Job shadow weeks, career days, and open-door events at tech clusters** (e.g. Ülemiste City, Tehnopol) — these are relevant if they take place in a tech/startup hub where the participating companies are predominantly tech companies. Include them even if the event itself isn't strictly "about" technology.
 
-### Pagination and scrolling limits
+### Per-source crawling notes
 
 **IMPORTANT: Do NOT dismiss sources after a surface-level scan. Be thorough — paginate, scroll, and dig into each source.**
 
@@ -97,8 +97,8 @@ candidate = { title, date, url, source_url, location (if available) }
 - **ECB** (`ecb.ee/calendar`): This is a goldmine of tech conferences. Scan the full table for tech keywords (cyber, digital, AI, startup, blockchain, fintech, smart, IoT, cloud, etc.). **Check ALL future years available in the year dropdown** — use the year dropdown at the top of the page and click the search button to switch years. ECB lists events years in advance (2027, 2028, etc.). The goal is to have as many events as possible in the calendar, even far ahead. Each table row has a "WWW" column (3rd column) with a direct link to the event website — **always extract that URL**, don't link to the ECB calendar page itself. When unsure if an event fits, open its detail page to investigate.
 - **Fienta** (`fienta.com`): Click "Load more" **at least 10 times** to see events up to 2 weeks out. The first page only shows today's events. Scan all loaded events for tech relevance — there are tech events mixed in among cultural ones.
 - **Luma general/discovery pages** (`luma.com/tech`, `luma.com/discover`): Only look at events **within the next 2 weeks** — these pages list global events and get very long.
-- **Facebook groups/feeds**: Scroll down at most 10 scroll iterations.
-- **LinkedIn feeds**: Scroll at most 5 times — these are noisy and most event links appear in recent posts.
+- **Facebook groups/feeds**: Facebook feed content renders as empty `blockquote: Facebook` placeholders in accessibility snapshots — you won't see post text. **Use `browser_take_screenshot` instead** (same approach as Discord) to read the feed visually. Take a screenshot, read the posts from the image, and extract any event links or announcements. Scroll down at most 10 scroll iterations, taking screenshots as needed. For pages with an Events tab, check the Events tab first (accessibility snapshots work there), then **always also check the main feed** via screenshots — some pages post event links in their feed but don't create formal FB events (e.g. EstoniaWEB3, Palo Alto Club).
+- **LinkedIn feeds**: Scroll at most 5 times — these are noisy and most event links appear in recent posts. For company pages with an Events tab, check events first, then also scroll the posts feed. LinkedIn accessibility snapshots generally work better than Facebook, but use `browser_take_screenshot` if content appears empty.
 - **K-space** (`wiki.k-space.ee`): Chaostreffs is a valid recurring event (every Thursday). Check the wiki page to confirm it's still running, then check the calendar's recurring event RRULE and **extend the UNTIL date to ~6 months from today** if needed (use `gog calendar update` with `--rrule` and `--scope all`). Also check for one-off events on the events page.
 - **Discord**: Discord is a SPA that renders very poorly in accessibility snapshots — you'll get almost no content. **Use `browser_take_screenshot` instead** to read the channel visually. Take a screenshot, read the messages from the image, and extract any event links or announcements.
 
@@ -217,6 +217,5 @@ After all events are added, run the `estonia-events-coda` skill to:
 - Including non-tech events (general ticketing sites list everything)
 - Not handling login walls gracefully (skip, don't crash)
 - **Assuming you're not logged in** to LinkedIn/Discord — the browser session is typically already authenticated. Always try navigating first.
-- **Only checking the Events tab on Facebook/LinkedIn pages** — some pages post event links in their feed but don't create formal FB/LinkedIn events. Check both the Events tab AND the main feed/posts.
 - Not checking calendar for duplicates before presenting
 - Trying to extract full details during crawl phase (just get links + basic info, full extraction happens in add phase)
