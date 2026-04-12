@@ -29,11 +29,12 @@ Required env vars:
 
 1. Read event source URLs from Vivaldi bookmarks (fresh each time)
 2. Open each source in browser and extract event links/info
-3. Deduplicate against existing calendar
-4. Present ALL candidates in a numbered table
-5. User approves by number
-6. Add approved events using `estonia-events-add` skill
-7. Update Coda using `estonia-events-coda` skill
+3. Verify ALL sources were crawled (mandatory checkpoint)
+4. Deduplicate against existing calendar
+5. Present ALL candidates in a numbered table
+6. User approves by number
+7. Add approved events using `estonia-events-add` skill
+8. Update Coda using `estonia-events-coda` skill
 
 ## Step 1: Read Bookmarks
 
@@ -102,7 +103,13 @@ candidate = { title, date, url, source_url, location (if available) }
 - **K-space** (`wiki.k-space.ee`): Chaostreffs is a valid recurring event (every Thursday). Check the wiki page to confirm it's still running, then check the calendar's recurring event RRULE and **extend the UNTIL date to ~6 months from today** if needed (use `gog calendar update` with `--rrule` and `--scope all`). Also check for one-off events on the events page.
 - **Discord**: Discord is a SPA that renders very poorly in accessibility snapshots — you'll get almost no content. **Use `browser_take_screenshot` instead** to read the channel visually. Take a screenshot, read the messages from the image, and extract any event links or announcements.
 
-## Step 3: Deduplicate
+## Step 3: Verify ALL Sources Were Crawled
+
+**STOP and check before proceeding.** Go through the full bookmark list from Step 1 and confirm every single URL was visited. If ANY source was skipped — for any reason (felt noisy, seemed time-intensive, "enough candidates already", context getting long) — go back and crawl it NOW before moving on.
+
+This is a known failure mode: after crawling 20+ sources and collecting many candidates, there is a strong temptation to skip the remaining "hard" sources (Fienta with 10+ load-more clicks, LinkedIn feeds, Discord). These are exactly the sources most likely to have unique events not found elsewhere. Do not proceed to deduplication until every source has been visited.
+
+## Step 4: Deduplicate
 
 After collecting all candidates, check each against the existing calendar:
 
@@ -124,7 +131,7 @@ Compare by:
 
 Remove duplicates from the candidate list.
 
-## Step 4: Filter
+## Step 5: Filter
 
 Remove candidates that are NOT IT/tech/startup related. Keep events about:
 
@@ -152,7 +159,7 @@ Remove events about:
 
 **When in doubt, INCLUDE the candidate** — the user will make the final call.
 
-## Step 5: Present Candidates
+## Step 6: Present Candidates
 
 After ALL sources have been crawled, present the full candidate list as a numbered table:
 
@@ -185,7 +192,7 @@ Format:
 
 Then ask: **"Which events to add?"**
 
-## Step 6: Add Approved Events
+## Step 7: Add Approved Events
 
 For each approved event, use the `estonia-events-add` skill flow:
 
@@ -195,9 +202,9 @@ For each approved event, use the `estonia-events-add` skill flow:
 4. Check for duplicates (should be clean but double-check)
 5. Create calendar entry
 
-## Step 7: Update Coda
+## Step 8: Update Coda
 
-**Auto-proceed: after all approved events are added in Step 6, immediately proceed to this step without asking the user.**
+**Auto-proceed: after all approved events are added in Step 7, immediately proceed to this step without asking the user.**
 
 After all events are added, run the `estonia-events-coda` skill to:
 
