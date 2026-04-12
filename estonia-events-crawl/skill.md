@@ -60,6 +60,8 @@ candidate = { title, date, url, source_url, location (if available) }
 
 ### General approach for every source
 
+**NEVER skip sources.** If a page requires login, ask the user to log in. Do not be lazy and assume a source has nothing — every source is bookmarked for a reason.
+
 1. Navigate to the URL in browser
 2. Handle cookie banners / popups (dismiss them)
 3. Take a snapshot
@@ -92,11 +94,11 @@ candidate = { title, date, url, source_url, location (if available) }
 
 If a page requires login and you're not logged in:
 
-- **Facebook**: Try to extract what's visible without login (event pages often show basic info). If fully blocked, skip.
-- **LinkedIn**: Will need login. If not logged in, skip and note it. User will log in for next run.
-- **Discord**: Requires login. Skip and note it if not logged in.
+1. Open the login page in the browser
+2. Ask the user to log in
+3. Wait for confirmation, then continue crawling that source
 
-Don't ask the user to log in during the crawl — just skip and report at the end.
+Do NOT silently skip sources and "report at the end" — that defeats the purpose of crawling.
 
 ## Step 3: Deduplicate
 
