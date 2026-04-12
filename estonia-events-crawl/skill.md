@@ -121,7 +121,6 @@ candidate = { title, date, url, source_url, location (if available) }
   - For pages with an Events tab, check the Events tab first (snapshots work there), then **always also check the main feed** via screenshots — some pages post event links but don't create formal FB events (e.g. EstoniaWEB3, Palo Alto Club)
   - **URL extraction**: event cards in snapshots have truncated titles but include a `link` element with `/url:` — always extract that URL. For feed posts with event links visible only in screenshots, navigate to the post to get the actual URL
 - **LinkedIn feeds**:
-  - For every post that mentions an event, check whether the event date is in the future
   - For company pages with an Events tab, check events first, then also scroll the posts feed
   - Snapshots generally work better than Facebook, but use `browser_take_screenshot` if content appears empty
 - **K-space** (`wiki.k-space.ee`):
@@ -145,10 +144,11 @@ After collecting all candidates, check each against the existing calendar:
 ```bash
 set -a && source "${SKILLS_DIR:-$HOME/.claude/skills}/.env" && set +a
 
-# Check by date range
+# Check by date range — MUST use --all-pages (default --max is only 10!)
 gog calendar list "$ESTONIA_EVENTS_CALENDAR_ID" \
   --from "YYYY-MM-DDT00:00:00+02:00" \
   --to "YYYY-MM-DDT23:59:59+02:00" \
+  --all-pages \
   --json
 ```
 
