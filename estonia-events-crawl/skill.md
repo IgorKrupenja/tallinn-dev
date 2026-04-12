@@ -173,7 +173,7 @@ After ALL sources have been crawled, present the full candidate list as a number
 
 Also note:
 
-- Any sources that were skipped (login required, page errors, etc.)
+- Any sources that were skipped (page errors, etc.)
 - Total sources crawled vs skipped
 
 Format:
@@ -183,11 +183,8 @@ Format:
 |---|-------|------|----------|-----|--------|
 | 1 | ... | ... | ... | https://... | ... |
 
-⚠️ Skipped sources (login required):
-- linkedin.com/company/foundmeio/events/ — not logged in
-- discord.com/channels/... — not logged in
 
-✅ Crawled: 27/30 sources | ⏭️ Skipped: 3
+✅ Crawled: 30/30 sources
 ```
 
 Then ask: **"Which events to add?"**
