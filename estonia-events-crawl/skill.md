@@ -100,6 +100,7 @@ candidate = { title, date, url, source_url, location (if available) }
 - **Facebook groups/feeds**: Scroll down at most 10 scroll iterations.
 - **LinkedIn feeds**: Scroll at most 5 times — these are noisy and most event links appear in recent posts.
 - **K-space** (`wiki.k-space.ee`): Chaostreffs is a valid recurring event (every Thursday). Check the wiki page to confirm it's still running, then check the calendar's recurring event RRULE and **extend the UNTIL date to ~6 months from today** if needed (use `gog calendar update` with `--rrule` and `--scope all`). Also check for one-off events on the events page.
+- **Discord**: Discord is a SPA that renders very poorly in accessibility snapshots — you'll get almost no content. **Use `browser_take_screenshot` instead** to read the channel visually. Take a screenshot, read the messages from the image, and extract any event links or announcements.
 
 ## Step 3: Deduplicate
 
