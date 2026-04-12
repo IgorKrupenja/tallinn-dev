@@ -30,24 +30,6 @@ Required env vars (same as add/coda skills):
 5. User approves by number
 6. Add approved events using `estonia-events-add` skill
 7. Update Coda using `estonia-events-coda` skill
-8. Save crawl state
-
-## Step 0: Load State
-
-State file: `${SKILLS_DIR:-$HOME/.claude/skills}/estonia-events-crawl/crawl-state.json`
-
-```json
-{
-  "sources": {
-    "https://example.com/events": {
-      "last_crawl": "2026-03-18",
-      "last_event_date": "2026-03-15"
-    }
-  }
-}
-```
-
-If the file doesn't exist, create it with empty `sources: {}`. The `last_event_date` field is used for sources with chronological feeds (e.g., Facebook) to know when to stop scrolling.
 
 ## Step 1: Read Bookmarks
 
@@ -102,7 +84,7 @@ candidate = { title, date, url, source_url, location (if available) }
 - **ECB** (`ecb.ee/calendar`): This is a goldmine of tech conferences. Scan the full table for tech keywords (cyber, digital, AI, startup, blockchain, fintech, smart, IoT, cloud, etc.). **Check ALL future years available in the year dropdown** — use the year dropdown at the top of the page and click the search button to switch years. ECB lists events years in advance (2027, 2028, etc.). The goal is to have as many events as possible in the calendar, even far ahead. Each table row has a "WWW" column (3rd column) with a direct link to the event website — **always extract that URL**, don't link to the ECB calendar page itself. When unsure if an event fits, open its detail page to investigate.
 - **Fienta** (`fienta.com`): Click "Load more" **at least 10 times** to see events up to 2 weeks out. The first page only shows today's events. Scan all loaded events for tech relevance — there are tech events mixed in among cultural ones.
 - **Luma general/discovery pages** (`luma.com/tech`, `luma.com/discover`): Only look at events **within the next 2 weeks** — these pages list global events and get very long.
-- **Facebook groups/feeds**: Scroll down but stop at `last_event_date` from crawl state, or at most 10 scroll iterations if no state exists.
+- **Facebook groups/feeds**: Scroll down at most 10 scroll iterations.
 - **LinkedIn feeds**: Scroll at most 5 times — these are noisy and most event links appear in recent posts.
 - **K-space** (`wiki.k-space.ee`): Chaostreffs is a valid recurring event (every Thursday). Ensure it's in the calendar up to ~6 months out. Also check for one-off events on the events page.
 
@@ -218,29 +200,6 @@ After all events are added, run the `estonia-events-coda` skill to:
 3. Label new events
 4. Add missing links
 
-## Step 8: Save State
-
-**Auto-proceed: after Coda is updated in Step 7, immediately proceed to save state without asking the user.**
-
-Update `crawl-state.json` with:
-
-- `last_crawl` date for each source that was successfully crawled
-- `last_event_date` for chronological sources (latest event date seen)
-
-```bash
-# Write updated state
-cat > "${SKILLS_DIR:-$HOME/.claude/skills}/estonia-events-crawl/crawl-state.json" << 'EOF'
-{
-  "sources": {
-    "https://...": {
-      "last_crawl": "2026-03-18",
-      "last_event_date": "2026-04-15"
-    }
-  }
-}
-EOF
-```
-
 ## Common Pitfalls
 
 - **Dismissing sources after a surface-level scan** — e.g. seeing only today's events on Fienta and giving up, or skipping ECB because it looks like a big table. Dig deeper!
@@ -251,7 +210,6 @@ EOF
 - Not processing ALL sources before presenting candidates
 - Including non-tech events (general ticketing sites list everything)
 - Not handling login walls gracefully (skip, don't crash)
-- Forgetting to update crawl state after successful run
 - Not checking calendar for duplicates before presenting
 - Trying to extract full details during crawl phase (just get links + basic info, full extraction happens in add phase)
 - Spending too long on discovery pages (respect the pagination/scroll limits)
