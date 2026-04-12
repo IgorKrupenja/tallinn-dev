@@ -78,7 +78,6 @@ candidate = { title, date, url, source_url, location (if available) }
 4. Look for event listings: titles with dates, links to event detail pages
 5. Extract future events — ignore past ones
 6. If the page has pagination or "load more", scroll/click to get more (see limits below)
-7. If a login wall blocks content (LinkedIn, Discord), skip the source and note it
 
 ### What to look for in snapshots
 
