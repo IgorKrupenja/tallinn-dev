@@ -1,9 +1,9 @@
 ---
-name: estonia-events-coda
+name: events-coda
 description: Update and label events in the Estonia IT Events Coda database. Use when labeling events, adding missing links, or cleaning up the Coda table.
 ---
 
-# Estonia IT Events - Coda Update Skill
+# Events - Coda Update Skill
 
 Update event labels and links in the Estonia IT Events Coda table.
 

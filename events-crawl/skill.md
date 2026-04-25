@@ -1,9 +1,9 @@
 ---
-name: estonia-events-crawl
+name: events-crawl
 description: Crawl event sources from Vivaldi bookmarks to discover new IT events in Estonia. Opens each source in browser, extracts event candidates, presents them for approval, then adds approved ones to calendar and updates Coda.
 ---
 
-# Estonia IT Events - Crawl Sources Skill
+# Events - Crawl Sources Skill
 
 Discover new IT events by crawling bookmarked event sources. Extracts candidates, deduplicates against the calendar, and presents a batch for user approval.
 
@@ -33,8 +33,8 @@ Required env vars:
 4. Deduplicate against existing calendar
 5. Present ALL candidates in a numbered table
 6. User approves by number
-7. Add approved events using `estonia-events-add` skill
-8. Update Coda using `estonia-events-coda` skill
+7. Add approved events using `events-add` skill
+8. Update Coda using `events-coda` skill
 
 ## Step 1: Read Bookmarks
 
@@ -221,7 +221,7 @@ Then ask: **"Which events to add?"**
 
 ## Step 7: Add Approved Events
 
-For each approved event, use the `estonia-events-add` skill flow:
+For each approved event, use the `events-add` skill flow:
 
 1. Open the event URL in browser
 2. Extract full details (click "See more" on FB, etc.)
@@ -233,7 +233,7 @@ For each approved event, use the `estonia-events-add` skill flow:
 
 **Auto-proceed: after all approved events are added in Step 7, immediately proceed to this step without asking the user.**
 
-After all events are added, run the `estonia-events-coda` skill to:
+After all events are added, run the `events-coda` skill to:
 
 1. Trigger Google Calendar sync
 2. Auto-archive past events

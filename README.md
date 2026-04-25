@@ -16,7 +16,7 @@ Uses the common [Agent Skills](https://agentskills.io/home) format supported by 
 
 ## Skills
 
-### estonia-events-crawl
+### events-crawl
 
 Crawl bookmarked event sources (FB groups, Eventbrite, ECB, Fienta, Luma, LinkedIn, Discord, etc.) to discover new IT events in Estonia. Deduplicates against the calendar, presents candidates for approval, then chains into the add and Coda skills.
 
@@ -30,7 +30,7 @@ Crawl bookmarked event sources (FB groups, Eventbrite, ECB, Fienta, Luma, Linked
 | `CODA_DOC_ID`                | Coda document ID                                     |
 | `CODA_TABLE_ID`              | Coda table ID                                        |
 
-### estonia-events-add
+### events-add
 
 Add tech events to the calendar from any URL with full content extraction, venue resolution, and duplicate checking.
 
@@ -39,7 +39,7 @@ Add tech events to the calendar from any URL with full content extraction, venue
 | `ESTONIA_EVENTS_CALENDAR_ID` | Target Google Calendar ID                  |
 | `GOPLACES_API_KEY`           | Google Places API key for venue resolution |
 
-### estonia-events-coda
+### events-coda
 
 Label and maintain the events database in Coda — auto-archive past events, populate missing labels and links from descriptions.
 

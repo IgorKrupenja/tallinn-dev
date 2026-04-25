@@ -1,9 +1,9 @@
 ---
-name: estonia-events-add
+name: events-add
 description: Add IT events to the Estonia IT Events calendar. Use when adding events from URLs (Facebook, Eventbrite, Luma, etc.) with full extraction, location resolution, and duplicate checking.
 ---
 
-# Estonia IT Events - Add Event Skill
+# Events - Add Event Skill
 
 Add new events to Igor's "Estonia IT Events" Google Calendar with full content extraction and location resolution.
 
