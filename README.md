@@ -11,8 +11,7 @@ Uses the common [Agent Skills](https://agentskills.io/home) format supported by 
 
 ## Setup
 
-1. Clone this repo into a folder your agentic AI tool uses for skills.
-2. Run `cp .env.example .env` and fill in your values in the `.env` file.
+Run `cp .env.example .env` and fill in your values in the `.env` file.
 
 ## Skills
 
