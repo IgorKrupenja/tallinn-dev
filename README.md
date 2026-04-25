@@ -40,7 +40,7 @@ Add tech events to the calendar from any URL with full content extraction, venue
 
 ### events-coda
 
-Label and maintain the events database in Coda — auto-archive past events, populate missing labels and links from descriptions.
+Label and maintain the events database in Coda: auto-archive past events, populate missing labels and links from descriptions.
 
 | Variable         | Description                   |
 | ---------------- | ----------------------------- |
