@@ -122,6 +122,8 @@ gog calendar create "$ESTONIA_EVENTS_CALENDAR_ID" \
 Full event description text here..."
 ```
 
+**⚠️ Date format also applies to `create`:** `--from` and `--to` MUST use RFC3339 with timezone (e.g. `2027-03-01T09:00:00+02:00`). Date-only format (`2027-03-01`) returns `Google API error (400 badRequest): Bad Request`. For all-day or multi-day events, pick reasonable start/end times (e.g. `09:00:00`–`18:00:00` on the appropriate days).
+
 ## Quality Checklist
 
 Before creating the event:
@@ -143,6 +145,7 @@ Before creating the event:
 ❌ **NOT CHECKING CURRENT DATE FIRST** — always run `date` first to avoid year errors!
 ❌ Not checking for duplicates before adding
 ❌ Using date-only format (YYYY-MM-DD) in duplicate check — returns zero results!
+❌ Using date-only format (YYYY-MM-DD) in `gog calendar create --from/--to` — fails with 400 Bad Request!
 ❌ Forgetting to click "See more" on Facebook
 ❌ Summarizing or shortening the description
 ❌ Translating the content
