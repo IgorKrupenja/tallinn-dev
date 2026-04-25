@@ -130,6 +130,7 @@ candidate = { title, date, url, source_url, location (if available) }
 - **Discord**: SPA that renders very poorly in accessibility snapshots.
   - **Use `browser_take_screenshot` instead** to read the channel visually
   - If you see an event mentioned in a screenshot, **navigate to the linked URL to confirm details** — a screenshot alone is not a substitute for having the actual event URL
+  - **Newest messages are at the BOTTOM** — Discord channels load most-recent first. Scroll the message list UP (not down) repeatedly to load older posts. Keep scrolling until you've seen messages from at least the past month.
 
 ## Step 3: Verify ALL Sources Were Crawled
 
