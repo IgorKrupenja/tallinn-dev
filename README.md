@@ -1,14 +1,13 @@
 # tallinn-dev
 
-AI agent skills that power [tallinn.dev](https://www.tallinn.dev) — the [Estonia IT events calendar](https://calendar.google.com/calendar/embed?src=9d3f200d21bdcefd62afd208681817ebf5876ec5557ea99d1794fbe3b1f24f2e%40group.calendar.google.com). They crawl bookmarked sources for new events, add them to Google Calendar with full content and resolved venues, and label them in the [tallinn.dev Coda backend](https://coda.io/d/Estonia-IT-events_dzkj730WT5a/). Uses the common [Agent Skills](https://agentskills.io/home) format supported by Claude Code, Cursor, Gemini CLI, Codex, OpenClaw and others.
+AI agent skills that power [tallinn.dev](https://www.tallinn.dev) — the [Estonia IT events calendar](https://calendar.google.com/calendar/embed?src=9d3f200d21bdcefd62afd208681817ebf5876ec5557ea99d1794fbe3b1f24f2e%40group.calendar.google.com). They crawl bookmarked sources for new events, add them to Google Calendar with full content and resolved venues, and intelligently label them via Coda API. 
+
+Uses the common [Agent Skills](https://agentskills.io/home) format supported by Claude Code, Cursor, Gemini CLI, Codex, OpenClaw and others.
 
 ## Prerequisites
 
-- [`gog`](https://gogcli.sh) — Google Suite CLI used for calendar operations: `brew install gogcli`
-- [`jq`](https://jqlang.org) — JSON processor used everywhere: `brew install jq`
-- [`goplaces`](https://github.com/steipete/goplaces) — Google Places CLI for venue resolution (used by `estonia-events-add`): `brew install steipete/tap/goplaces`
-- A Chromium-based browser (Vivaldi, Brave, Chrome…) with a bookmarks folder of event sources — only needed by `estonia-events-crawl`.
-- Run `gog auth` once to authorize Google access before first use.
+- CLI tools [`gog`](https://gogcli.sh), [`jq`](https://jqlang.org), [`goplaces`](https://github.com/steipete/goplaces).
+- A Chromium-based browser with a bookmarks folder of event sources.
 
 ## Setup
 
