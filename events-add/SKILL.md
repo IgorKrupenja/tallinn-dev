@@ -19,8 +19,8 @@ set -a && source "${SKILLS_DIR:-$HOME/.claude/skills}/.env" && set +a
 
 Required env vars:
 
-- `$ESTONIA_EVENTS_CALENDAR_ID` - Target calendar ID
-- `$GOPLACES_API_KEY` - Google Places API key
+- `$GOOGLE_CALENDAR_ID` - Target calendar ID
+- `$GOOGLE_PLACES_API_KEY` - Google Places API key
 
 ## Workflow
 
@@ -56,7 +56,7 @@ Use the `browser` tool (or `web_fetch` as fallback) to get the full event descri
 If a venue name is provided, resolve it to a full address:
 
 ```bash
-goplaces search "Venue Name" --api-key "$GOPLACES_API_KEY" --json
+goplaces search "Venue Name" --api-key "$GOOGLE_PLACES_API_KEY" --json
 ```
 
 Use the `address` field from the result for the calendar event location.
@@ -70,7 +70,7 @@ Fetch existing events for the date range:
 ```bash
 # Fetch events for the specific date
 # IMPORTANT: Use RFC3339 format with timezone, NOT date-only format
-gog calendar list "$ESTONIA_EVENTS_CALENDAR_ID" \
+gog calendar list "$GOOGLE_CALENDAR_ID" \
   --from "YYYY-MM-DDT00:00:00+02:00" \
   --to "YYYY-MM-DDT23:59:59+02:00" \
   --json
@@ -97,7 +97,7 @@ gog calendar list "$ESTONIA_EVENTS_CALENDAR_ID" \
 
 Use `gog calendar create` with these requirements:
 
-**Target Calendar:** MUST use `$ESTONIA_EVENTS_CALENDAR_ID`
+**Target Calendar:** MUST use `$GOOGLE_CALENDAR_ID`
 
 **Description Format (MANDATORY):**
 
@@ -112,7 +112,7 @@ The first line MUST be the event URL, followed by an empty line, then the full d
 ### 6. Command Template
 
 ```bash
-gog calendar create "$ESTONIA_EVENTS_CALENDAR_ID" \
+gog calendar create "$GOOGLE_CALENDAR_ID" \
   --summary "Event Title" \
   --from "YYYY-MM-DDTHH:MM:SS+02:00" \
   --to "YYYY-MM-DDTHH:MM:SS+02:00" \

@@ -18,14 +18,14 @@ Uses the common [Agent Skills](https://agentskills.io/home) format supported by 
 
 ### events-crawl
 
-Crawl bookmarked event sources (FB groups, Eventbrite, ECB, Fienta, Luma, LinkedIn, Discord, etc.) to discover new IT events in Estonia. Deduplicates against the calendar, presents candidates for approval, then chains into the add and Coda skills.
+Crawl bookmarked event sources (FB groups, Eventbrite, ECB, Fienta, Luma, LinkedIn, Discord, etc.) to discover new IT events in Estonia. Deduplicates against the calendar, presents candidates for approval, then chains into the [add](#events-add) and [Coda](#events-coda) skills.
 
 | Variable                     | Description                                          |
 | ---------------------------- | ---------------------------------------------------- |
 | `BOOKMARKS_FILE`             | Path to your Chromium-based browser's bookmarks JSON |
 | `BOOKMARKS_FOLDER`           | Folder path inside the bookmarks tree                |
-| `ESTONIA_EVENTS_CALENDAR_ID` | Target Google Calendar ID                            |
-| `GOPLACES_API_KEY`           | Google Places API key for venue resolution           |
+| `GOOGLE_CALENDAR_ID`         | Target Google Calendar ID                            |
+| `GOOGLE_PLACES_API_KEY`      | Google Places API key for venue resolution           |
 | `CODA_API_TOKEN`             | Coda API authentication token                        |
 | `CODA_DOC_ID`                | Coda document ID                                     |
 | `CODA_TABLE_ID`              | Coda table ID                                        |
@@ -36,8 +36,8 @@ Add tech events to the calendar from any URL with full content extraction, venue
 
 | Variable                     | Description                                |
 | ---------------------------- | ------------------------------------------ |
-| `ESTONIA_EVENTS_CALENDAR_ID` | Target Google Calendar ID                  |
-| `GOPLACES_API_KEY`           | Google Places API key for venue resolution |
+| `GOOGLE_CALENDAR_ID`         | Target Google Calendar ID                  |
+| `GOOGLE_PLACES_API_KEY`      | Google Places API key for venue resolution |
 
 ### events-coda
 

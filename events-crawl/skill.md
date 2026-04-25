@@ -21,8 +21,8 @@ Required env vars:
 
 - `$BOOKMARKS_FILE` - Path to Chromium bookmarks JSON file
 - `$BOOKMARKS_FOLDER` - Folder path in bookmarks (e.g. `talllinn.dev/Sources`)
-- `$ESTONIA_EVENTS_CALENDAR_ID` - Target calendar ID
-- `$GOPLACES_API_KEY` - Google Places API key
+- `$GOOGLE_CALENDAR_ID` - Target calendar ID
+- `$GOOGLE_PLACES_API_KEY` - Google Places API key
 - `$CODA_API_TOKEN`, `$CODA_DOC_ID`, `$CODA_TABLE_ID` - Coda access
 
 ## Overview
@@ -146,7 +146,7 @@ After collecting all candidates, check each against the existing calendar:
 set -a && source "${SKILLS_DIR:-$HOME/.claude/skills}/.env" && set +a
 
 # Check by date range — MUST use --all-pages (default --max is only 10!)
-gog calendar list "$ESTONIA_EVENTS_CALENDAR_ID" \
+gog calendar list "$GOOGLE_CALENDAR_ID" \
   --from "YYYY-MM-DDT00:00:00+02:00" \
   --to "YYYY-MM-DDT23:59:59+02:00" \
   --all-pages \
