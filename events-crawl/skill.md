@@ -114,6 +114,7 @@ candidate = { title, date, url, source_url, location (if available) }
 - **Luma** (`luma.com/tech`, `luma.com/discover`, specific calendars):
   - The 2-week limit applies **only to global/international event listings** (major events, popular calendars)
   - The **"Nearby Events" section shows local Tallinn events** — extract ALL of them regardless of date, since there are very few
+  - **Nearby Events is lazy-loaded** — after navigating, you MUST `window.scrollTo(0, document.body.scrollHeight)` and wait ~2 seconds before reading the section. On first load `body.innerText` shows just the heading followed immediately by the footer (`"Nearby Events\nDiscoverPricingHelp\nGet the App"`) — that means the cards haven't fetched yet, NOT that there are no local events. Do not treat this as empty.
   - Nearby events render as `button` elements in snapshots without visible hrefs — **extract the `/url:` from the nested `link` element** (e.g. `/url: /yurdrxp2` → `https://luma.com/yurdrxp2`), or click the button to navigate
   - For **specific Luma calendars** (e.g. `luma.com/EstoniAI`), extract ALL upcoming events — these pages are small
 - **Facebook groups/feeds**:
