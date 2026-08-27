@@ -1,12 +1,4 @@
 {
-  "added": [
-    {
-      "url": "https://luma.com/example",
-      "title": "Example AI Meetup Tallinn",
-      "year": 2026,
-      "added_at": "2026-08-27"
-    }
-  ],
   "declined": [
     {
       "url": "https://example.com/some-conference",

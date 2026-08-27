@@ -1,56 +1,197 @@
 {
-  "_readme": "Memory of what NOT to offer again. Seeded 2026-08-27. Schema: docs in skill.md § Candidate memory. Edit by hand freely; to un-decline something just delete its entry.",
-
-  "added": [
-    {"url": "https://www.tehnopol.ee/en/event/ai-accelerator-pre-application-masterclass-with-mentors-197351/", "title": "AI ACCELERATOR: Pre-application masterclass with mentors", "year": 2026, "added_at": "2026-08-27"},
-    {"url": "https://luma.com/sruodkz8", "title": "AWS Innovation Breakfast by TIDORA", "year": 2026, "added_at": "2026-08-27"},
-    {"url": "https://luma.com/m1iseigv", "title": "TECH & GOD Meetup - September", "year": 2026, "added_at": "2026-08-27"},
-    {"url": "https://www.enisa.europa.eu/events/trust-services-and-eid-forum-ca-day-2026", "title": "Trust Services and eID Forum - CA Day 2026", "year": 2026, "added_at": "2026-08-27"},
-    {"url": "https://luma.com/7764fnjn", "title": "Vibe Code Atelier - Demo Day / Meetup for Builders #8", "year": 2026, "added_at": "2026-08-27"},
-    {"url": "https://www.tehnopol.ee/en/event/from-ai-innovation-to-business-value-198667/", "title": "From AI innovation to business value", "year": 2026, "added_at": "2026-08-27"},
-    {"url": "https://www.eventbrite.com/e/meet-the-estonia-startup-ecosystem-in-person-networking-event-tickets-1994870546505", "title": "Meet the Estonia Startup Ecosystem (In-Person Networking Event)", "year": 2026, "added_at": "2026-08-27"},
-    {"url": "https://luma.com/1x1s75k6", "title": "Frontier Sessions #02 - Building Through Adversity", "year": 2026, "added_at": "2026-08-27"},
-    {"url": "https://www.eventbrite.com/e/startup-pitch-workshop-learn-from-estonias-top-entrepreneurs-tickets-1994870554529", "title": "Startup Pitch Workshop: Learn from Estonia's Top Entrepreneurs", "year": 2026, "added_at": "2026-08-27"},
-    {"url": "https://garage48.org/events/empoweringwomen", "title": "kood/Garage48 Empowering Women Hackathon", "year": 2026, "added_at": "2026-08-27"},
-    {"url": "https://luma.com/sqsa98dy", "title": "Youth Startup Summit 2026", "year": 2026, "added_at": "2026-08-27"},
-    {"url": "https://luma.com/estban-336e", "title": "EstBAN November Pitch Event", "year": 2026, "added_at": "2026-08-27"},
-    {"url": "https://cloudtechtallinn.com/", "title": "Cloud Tech Tallinn 2027", "year": 2027, "added_at": "2026-08-27"},
-    {"url": "https://www.sto.nato.int/icmcis/", "title": "ICMCIS 2027 - International Conference on Military Communication and Information Systems", "year": 2027, "added_at": "2026-08-27"},
-    {"url": "https://ccdcoe.org/cycon/", "title": "CyCon 2027 - 19th International Conference on Cyber Conflict", "year": 2027, "added_at": "2026-08-27"},
-
-    {"url": "https://www.disainioo.ee/2026-program/design-conference", "title": "International Design Conference", "year": 2026, "added_at": "2026-08-27", "note": "SAME EVENT as calendar's 'Future of Product Design' (Thu 1 Oct, Pohjala tehas). ECB lists it under a phantom 02.10 row - suppress so it stops resurfacing."},
-    {"url": "https://fienta.com/tallinndesignfestival-futureofproductdesign", "title": "International Conference Future of Product Design @ Tallinn Design Festival 2026", "year": 2026, "added_at": "2026-08-27"}
-  ],
-
+  "_readme": "Memory of what NOT to offer again. The CALENDAR is the source of truth for what is already added - it is not mirrored here. This file only holds what the calendar cannot express: declined (offered and not picked) and banned_series. Schema: skill.md, section 'Candidate memory'. Hand-editing is fine; to un-decline something just delete its entry.",
   "declined": [
-    {"url": "https://www.facebook.com/events/27721925120760225/", "title": "ULEMISTE CITY PAEV 2026 / ULEMISTE CITY DAY 2026", "year": 2026, "reason": "ignored", "declined_at": "2026-08-27"},
-    {"url": "https://fienta.com/et/merenduseinnopaev", "title": "Merenduse Innovatsioonipaev 2026", "year": 2026, "reason": "ignored", "declined_at": "2026-08-27"},
-    {"url": "https://ebs.ee/4th-aqmapps-conference", "title": "4th Annual Conference of Advanced Quantitative Methods and Analytics for Public Policy Support (AQMAPPS)", "year": 2026, "reason": "ignored", "declined_at": "2026-08-27"},
-    {"url": "https://www.facebook.com/events/2269006043912031/", "title": "kood/Empower Bootcamp Voru", "year": 2026, "reason": "ignored", "declined_at": "2026-08-27"},
-    {"url": "https://edw.ee/en/estonian-defence-week/symposium/", "title": "Estonian Defence Industry Symposium", "year": 2026, "reason": "ignored", "declined_at": "2026-08-27"},
-    {"url": "https://edw.ee/en/estonian-defence-week/abcd-conference/", "title": "Annual Baltic Conference on Defence 2026", "year": 2026, "reason": "ignored", "declined_at": "2026-08-27"},
-    {"url": "https://taltech.ee/en/PEMC2026/", "title": "IEEE PEMC 2026", "year": 2026, "reason": "ignored", "declined_at": "2026-08-27"},
-    {"url": "https://www.tehnopol.ee/en/event/defence-business-lab-demo-day-197782/", "title": "Defence Business Lab Demo Day", "year": 2026, "reason": "ignored", "declined_at": "2026-08-27"},
-    {"url": "https://www.facebook.com/events/1795510418537330/", "title": "Teaduskohvik Veest energia valja pigistamine", "year": 2026, "reason": "ignored", "declined_at": "2026-08-27"},
-    {"url": "https://www.disainioo.ee/en", "title": "Tallinn Design Festival", "year": 2026, "reason": "ignored", "declined_at": "2026-08-27"},
-    {"url": "https://conference.euas.eu/", "title": "Entrepreneurship and Innovation Conference Future DRIVE", "year": 2026, "reason": "ignored", "declined_at": "2026-08-27"},
-    {"url": "https://luma.com/7uysapu8", "title": "Oxford and Cambridge Society Public Lecture - Professor Tim Minshall: Your Life is Manufactured", "year": 2026, "reason": "ignored", "declined_at": "2026-08-27"},
-    {"url": "https://www.facebook.com/events/2088324595130444/", "title": "kood/Empower Bootcamp with Garage48", "year": 2026, "reason": "ignored", "declined_at": "2026-08-27"},
-    {"url": "https://hve.ee/en/event/tartu-hydrogen-days-2026-future-energy-today/", "title": "Tartu Hydrogen Days 2026", "year": 2026, "reason": "ignored", "declined_at": "2026-08-27"},
-    {"url": "https://garage48.org/events/future-of-wood-2026", "title": "Future of Wood 2026", "year": 2026, "reason": "ignored", "declined_at": "2026-08-27"},
-    {"url": "https://nex.day/", "title": "Nex Day 2027: After Management", "year": 2027, "reason": "ignored", "declined_at": "2026-08-27"},
-    {"url": "https://www.futureforum.ee/next-future-froum-on-april-7-8-2027/", "title": "Ulemiste City Future Forum", "year": 2027, "reason": "ignored", "declined_at": "2026-08-27"},
-    {"url": "https://turundajateliit.ee/en/global-design-festival-offf-makes-its-debut-in-estonia/", "title": "OFFF Tallinn 2027", "year": 2027, "reason": "ignored", "declined_at": "2026-08-27"},
-    {"url": "https://icieng.eu/", "title": "International Conference Innovation in Engineering - ICIE 2027", "year": 2027, "reason": "ignored", "declined_at": "2026-08-27"},
-    {"url": "https://taltech.ee/en/", "title": "IEEE International Symposium on Diagnostics for Electric Machines, Power Electronics and Drives SDEMPED 2027", "year": 2027, "reason": "ignored", "declined_at": "2026-08-27"},
-    {"url": "https://mobilitylab.ut.ee/mobile-tartu-conference/", "title": "Mobile Tartu Conference 2028", "year": 2028, "reason": "ignored", "declined_at": "2026-08-27"}
+    {
+      "url": "https://www.disainioo.ee/2026-program/design-conference",
+      "title": "International Design Conference",
+      "year": 2026,
+      "reason": "duplicate-of-calendar-event",
+      "declined_at": "2026-08-27",
+      "note": "Same event as 'Future of Product Design' (Thu 1 Oct, Pohjala tehas, fienta.com/tallinndesignfestival-futureofproductdesign) which IS on the calendar. ECB lists it a second time under a phantom 02.10 row with this different URL+title, so neither URL nor title+year matches the calendar entry. Kept here so it stops resurfacing."
+    },
+    {
+      "url": "https://www.facebook.com/events/27721925120760225/",
+      "title": "ULEMISTE CITY PAEV 2026 / ULEMISTE CITY DAY 2026",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-08-27"
+    },
+    {
+      "url": "https://fienta.com/et/merenduseinnopaev",
+      "title": "Merenduse Innovatsioonipaev 2026",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-08-27"
+    },
+    {
+      "url": "https://ebs.ee/4th-aqmapps-conference",
+      "title": "4th Annual Conference of Advanced Quantitative Methods and Analytics for Public Policy Support (AQMAPPS)",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-08-27"
+    },
+    {
+      "url": "https://www.facebook.com/events/2269006043912031/",
+      "title": "kood/Empower Bootcamp Voru",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-08-27"
+    },
+    {
+      "url": "https://edw.ee/en/estonian-defence-week/symposium/",
+      "title": "Estonian Defence Industry Symposium",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-08-27"
+    },
+    {
+      "url": "https://edw.ee/en/estonian-defence-week/abcd-conference/",
+      "title": "Annual Baltic Conference on Defence 2026",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-08-27"
+    },
+    {
+      "url": "https://taltech.ee/en/PEMC2026/",
+      "title": "IEEE PEMC 2026",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-08-27"
+    },
+    {
+      "url": "https://www.tehnopol.ee/en/event/defence-business-lab-demo-day-197782/",
+      "title": "Defence Business Lab Demo Day",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-08-27"
+    },
+    {
+      "url": "https://www.facebook.com/events/1795510418537330/",
+      "title": "Teaduskohvik Veest energia valja pigistamine",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-08-27"
+    },
+    {
+      "url": "https://www.disainioo.ee/en",
+      "title": "Tallinn Design Festival",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-08-27"
+    },
+    {
+      "url": "https://conference.euas.eu/",
+      "title": "Entrepreneurship and Innovation Conference Future DRIVE",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-08-27"
+    },
+    {
+      "url": "https://luma.com/7uysapu8",
+      "title": "Oxford and Cambridge Society Public Lecture - Professor Tim Minshall: Your Life is Manufactured",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-08-27"
+    },
+    {
+      "url": "https://www.facebook.com/events/2088324595130444/",
+      "title": "kood/Empower Bootcamp with Garage48",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-08-27"
+    },
+    {
+      "url": "https://hve.ee/en/event/tartu-hydrogen-days-2026-future-energy-today/",
+      "title": "Tartu Hydrogen Days 2026",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-08-27"
+    },
+    {
+      "url": "https://garage48.org/events/future-of-wood-2026",
+      "title": "Future of Wood 2026",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-08-27"
+    },
+    {
+      "url": "https://nex.day/",
+      "title": "Nex Day 2027: After Management",
+      "year": 2027,
+      "reason": "ignored",
+      "declined_at": "2026-08-27"
+    },
+    {
+      "url": "https://www.futureforum.ee/next-future-froum-on-april-7-8-2027/",
+      "title": "Ulemiste City Future Forum",
+      "year": 2027,
+      "reason": "ignored",
+      "declined_at": "2026-08-27"
+    },
+    {
+      "url": "https://turundajateliit.ee/en/global-design-festival-offf-makes-its-debut-in-estonia/",
+      "title": "OFFF Tallinn 2027",
+      "year": 2027,
+      "reason": "ignored",
+      "declined_at": "2026-08-27"
+    },
+    {
+      "url": "https://icieng.eu/",
+      "title": "International Conference Innovation in Engineering - ICIE 2027",
+      "year": 2027,
+      "reason": "ignored",
+      "declined_at": "2026-08-27"
+    },
+    {
+      "url": "https://taltech.ee/en/",
+      "title": "IEEE International Symposium on Diagnostics for Electric Machines, Power Electronics and Drives SDEMPED 2027",
+      "year": 2027,
+      "reason": "ignored",
+      "declined_at": "2026-08-27"
+    },
+    {
+      "url": "https://mobilitylab.ut.ee/mobile-tartu-conference/",
+      "title": "Mobile Tartu Conference 2028",
+      "year": 2028,
+      "reason": "ignored",
+      "declined_at": "2026-08-27"
+    }
   ],
-
   "banned_series": [
-    {"match": "tallinn tech social", "label": "Tallinn Tech Social / IT Social", "source": "*", "banned_at": "2026-08-03", "why": "Reported ticket scam (itsocialevent.com) - sells cheap tickets to events that do not happen. See skill.md Step 5."},
-    {"match": "tallinn tech mixer", "label": "Tallinn Tech Social (mixer variant)", "source": "*", "banned_at": "2026-08-03", "why": "Same organizer as above, alternate title."},
-    {"match": "business networking startups investors tech", "label": "MUD Events franchise networking", "source": "*", "banned_at": "2026-08-03", "why": "Removed by user request - paid franchise networking, template copy reused across cities."},
-    {"match": "founders room", "label": "The Founders Room (Founders Growth & Networking Hub)", "source": "https://www.meetup.com/find/?distance=tenMiles&source=EVENTS", "banned_at": "2026-08-27", "why": "Paid (30 EUR) weekly/recurring generic founder networking, incl. online editions."},
-    {"match": "istqb", "label": "ISTQB certification training courses", "source": "*", "banned_at": "2026-08-27", "why": "Paid certification training, not a community event - already excluded by the filter rules."}
+    {
+      "match": "tallinn tech social",
+      "label": "Tallinn Tech Social / IT Social",
+      "source": "*",
+      "banned_at": "2026-08-03",
+      "why": "Reported ticket scam (itsocialevent.com) - sells cheap tickets to events that do not happen. See skill.md Step 5."
+    },
+    {
+      "match": "tallinn tech mixer",
+      "label": "Tallinn Tech Social (mixer variant)",
+      "source": "*",
+      "banned_at": "2026-08-03",
+      "why": "Same organizer as above, alternate title."
+    },
+    {
+      "match": "business networking startups investors tech",
+      "label": "MUD Events franchise networking",
+      "source": "*",
+      "banned_at": "2026-08-03",
+      "why": "Removed by user request - paid franchise networking, template copy reused across cities."
+    },
+    {
+      "match": "founders room",
+      "label": "The Founders Room (Founders Growth & Networking Hub)",
+      "source": "https://www.meetup.com/find/?distance=tenMiles&source=EVENTS",
+      "banned_at": "2026-08-27",
+      "why": "Paid (30 EUR) weekly/recurring generic founder networking, incl. online editions."
+    },
+    {
+      "match": "istqb",
+      "label": "ISTQB certification training courses",
+      "source": "*",
+      "banned_at": "2026-08-27",
+      "why": "Paid certification training, not a community event - already excluded by the filter rules."
+    }
   ]
 }

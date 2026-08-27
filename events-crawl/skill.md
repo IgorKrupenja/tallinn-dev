@@ -25,21 +25,21 @@ Required env vars:
 - `$GOOGLE_PLACES_API_KEY` - Google Places API key
 - `$CODA_API_TOKEN`, `$CODA_DOC_ID`, `$CODA_TABLE_ID` - Coda access
 
-Also used: **`events-crawl/state.json`** — the memory of what Igor already added or ignored, so
-the same events are never offered twice. See the **Candidate memory** section near the end of this file.
-If it is missing, create it from `state.example.json`.
+Also used: **`events-crawl/state.json`** — the memory of what Igor was offered and passed on, so
+the same events are never offered twice. What is already *added* is not tracked there; the
+calendar is the source of truth for that. See the **Candidate memory** section near the end of
+this file. If `state.json` is missing, create it from `state.example.json`.
 
 ## Overview
 
 1. Read event source URLs from Vivaldi bookmarks (fresh each time)
 2. Open each source in browser and extract event links/info
 3. Verify ALL sources were crawled (mandatory checkpoint)
-4. Deduplicate against existing calendar
-5. Filter — including against **candidate memory** (`state.json`), so nothing Igor already
-   ignored is offered again
+4. Dump the calendar (the source of truth for what is already added)
+5. Filter — one pass drops what is already on the calendar AND what Igor already passed on
 6. Present ALL survivors in a numbered table
 7. User approves by number
-8. **Record the answer to `state.json`** — approved → `added`, everything else → `declined`
+8. **Record the answer to `state.json`** — everything presented and not picked → `declined`
 9. Add approved events using `events-add` skill
 10. Update Coda using `events-coda` skill
 
@@ -146,58 +146,73 @@ candidate = { title, date, url, source_url, location (if available) }
 
 This is a known failure mode: after crawling 20+ sources and collecting many candidates, there is a strong temptation to skip the remaining "hard" sources (Fienta with 10+ load-more clicks, LinkedIn feeds, Discord). These are exactly the sources most likely to have unique events not found elsewhere. Do not proceed to deduplication until every source has been visited.
 
-## Step 4: Deduplicate
+## Step 4: Dump the calendar
 
-After collecting all candidates, check each against the existing calendar:
+The calendar is the source of truth for what is already added. Dump it once — Step 5's filter
+does the actual matching, so there is no separate hand-rolled dedup pass to get wrong:
 
 ```bash
 set -a && source "${SKILLS_DIR:-$HOME/.claude/skills}/.env" && set +a
 
-# Check by date range — MUST use --all-pages (default --max is only 10!)
+# MUST use --all-pages (default --max is only 10!) and RFC3339 dates with timezone.
+# Range: today → a few years out, because ECB lists conferences years in advance.
 gog calendar list "$GOOGLE_CALENDAR_ID" \
-  --from "YYYY-MM-DDT00:00:00+02:00" \
-  --to "YYYY-MM-DDT23:59:59+02:00" \
-  --all-pages \
-  --json
+  --from "$(date -I)T00:00:00+02:00" \
+  --to "2029-12-31T23:59:59+02:00" \
+  --all-pages --json > /tmp/calendar.json
 ```
 
-Compare by:
+`gog` writes one JSON object per page, so the file may hold several concatenated objects —
+`candidates.py` handles that. Every event created by `events-add` has its URL on the first line
+of the description, which is what makes URL-level matching possible.
 
-- Event name (similar match, not exact — "OpenClaw Meetup" matches "OpenClaw Meetup Tallinn")
-- Start date/time (within a few minutes)
-- URL in description (exact match)
-
-Remove duplicates from the candidate list.
+Note `--all-pages` still emits a `nextPageToken`; ignore it, the pages are all there.
 
 ## Step 5: Filter
 
 ### Candidate memory — run this FIRST, before any human judgement
 
-**Igor should never be shown the same event twice.** If he was offered something and did not
-ask for it, that is a "no" and it must never resurface. This is enforced by
-`events-crawl/state.json` — do not re-derive the logic, just run the helper:
+**Igor should never be shown the same event twice** — neither one already on the calendar, nor
+one he was offered and passed on. If he was offered something and did not ask for it, that is a
+"no" and it must never resurface. Don't re-derive the logic, run the helper:
 
 ```bash
-# write the deduplicated candidates to a temp file first:
+# write the crawled candidates to /tmp/candidates.json first:
 #   [{ "title": ..., "date": ..., "url": ..., "source_url": ..., "location": ... }]
+# /tmp/calendar.json is the dump from Step 4.
 python3 "$SKILLS_DIR/events-crawl/candidates.py" filter \
-  "$SKILLS_DIR/events-crawl/state.json" /path/to/candidates.json > survivors.json
+  "$SKILLS_DIR/events-crawl/state.json" /tmp/candidates.json /tmp/calendar.json > survivors.json
 ```
 
 It prints `SHOW n / HIDE n` plus a one-line reason per hidden event to stderr, and the
-survivors as JSON on stdout. **Present only the survivors.** Mention the hidden count in the
-run summary (e.g. "12 suppressed by candidate memory") so the filter is visible, never silent.
+survivors as JSON on stdout. **Present only the survivors.** Mention the hidden count in the run
+summary (e.g. "26 suppressed: 4 already on calendar, 22 previously declined") so the filter is
+visible, never silent.
+
+**The calendar is the source of truth for what is already added** — `state.json` does NOT mirror
+it. Every event written by `events-add` carries its URL on the first line of the description, so
+the calendar is a complete URL index (verified: 231/231 non-Chaostreff events). This matters:
+if Igor deletes an event from the calendar it becomes offerable again, which is correct. A
+mirrored "added" list would silently suppress it forever.
+
+Always pass `calendar.json`. Without it the filter warns and only applies `state.json`, so
+already-added events would come back.
 
 Matching is deliberately layered, because the same event reappears in different clothes:
 
-| Layer | Catches |
-| --- | --- |
-| Normalized URL | utm/fbclid params, `www.`, trailing slash, `/et/` vs `/en/` |
-| Normalized title **+ year** | same event surfaced via a different link (e.g. ECB links a Facebook post one year and the official site the next) |
-| `banned_series` | whole recurring series / organizers, by title phrase, scoped to one source or `*` |
+| Layer | Source | Catches |
+| --- | --- | --- |
+| Normalized URL | calendar, then `declined` | utm/fbclid params, `www.`, trailing slash, `/et/` vs `/en/`, http/https |
+| Normalized title **+ year** | calendar, then `declined` | same event surfaced via a different link (e.g. ECB links a Facebook post one year and the official site the next) |
+| `banned_series` | `state.json` | whole recurring series / organizers, by title phrase, scoped to one source or `*` |
 
 **The year is part of the key on purpose.** Declining *Cloud Tech Tallinn 2027* must NOT hide
 *Cloud Tech Tallinn 2028* — annual conferences are the norm here. Series bans ignore the year.
+
+**Aliases.** Occasionally a source lists an event that IS on the calendar but under a different
+title, date *and* URL, so neither layer matches — e.g. ECB carries a phantom `02.10` row for the
+Tallinn Design Festival conference that actually runs `01.10`. Record those in `declined` with
+`reason: "duplicate-of-calendar-event"` and a `note` naming the real entry.
 
 ### Blocked organizers — hard exclusions
 
@@ -290,8 +305,11 @@ python3 "$SKILLS_DIR/events-crawl/candidates.py" record \
   "$SKILLS_DIR/events-crawl/state.json" /tmp/presented.json "add 1 2 5"
 ```
 
-Approved → `added`; the rest → `declined` with `reason: "ignored"`. Run this **even if he picks
-everything**, and **even if he picks nothing** ("none of these" → all declined).
+The rest → `declined` with `reason: "ignored"`. **Approved events are not written to
+`state.json`** — once they land on the calendar in Step 8, the calendar is their record. If an
+add fails, the event correctly shows up again next crawl.
+
+Run this **even if he picks nothing** ("none of these" → all declined).
 
 Edge cases:
 
@@ -338,16 +356,17 @@ Lives at `events-crawl/state.json`, next to this file. Committed to git (these a
 events — no privacy concern, and history makes a bad entry easy to undo). Plain JSON on
 purpose: hand-editing and `git diff` are the recovery tools.
 
+**Two buckets only.** There is deliberately no `added` list: the calendar already records what
+was added, and mirroring it here would go stale the moment Igor deletes something.
+
 ```jsonc
 {
-  "added": [
-    { "url": "https://...", "title": "...", "year": 2026, "added_at": "2026-08-27",
-      "note": "optional — e.g. why a URL is suppressed" }
-  ],
   "declined": [
     { "url": "https://...", "title": "...", "year": 2026,
       "reason": "ignored",           // "ignored" = presented and not picked
-      "declined_at": "2026-08-27" }
+                                     // "duplicate-of-calendar-event" = alias, see Aliases above
+      "declined_at": "2026-08-27",
+      "note": "optional — for aliases, name the real calendar entry" }
   ],
   "banned_series": [
     { "match": "founders room",      // normalized phrase, matched as substring of the title
@@ -365,7 +384,7 @@ this for you, so prefer it over editing by hand.
 Helper (`events-crawl/candidates.py`), all four subcommands:
 
 ```bash
-python3 candidates.py filter state.json candidates.json > survivors.json
+python3 candidates.py filter state.json candidates.json calendar.json > survivors.json
 python3 candidates.py record state.json presented.json "add 1 2 5"
 python3 candidates.py ban    state.json "<phrase>" "<label>" [source_url|*]
 python3 candidates.py unskip state.json "<url or title fragment>"
@@ -378,6 +397,10 @@ python3 candidates.py unskip state.json "<url or title fragment>"
   `record` is skipped, every ignored event comes back on the next crawl.
 - **Recording declines for a batch he never answered** — an unanswered batch is not a rejection.
   Only `record` once he has actually replied with a selection.
+- **Running `filter` without `calendar.json`** — it only applies `state.json` then, so events
+  already on the calendar are offered again. The helper warns on stderr; don't ignore it.
+- **Re-introducing an "added" list** — the calendar is the source of truth for that. A mirror
+  goes stale and would suppress an event Igor deliberately deleted.
 - **Hand-writing a `banned_series` match with digits or punctuation in it** — `normalize()` strips
   those, so the ban would never fire. Use the `ban` subcommand.
 - **Re-adding a blocked organizer** — check candidates against the blocklist in Step 5 before presenting. The blocked series are recurring, so they resurface on every Eventbrite crawl.
