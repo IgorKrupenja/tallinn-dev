@@ -25,16 +25,23 @@ Required env vars:
 - `$GOOGLE_PLACES_API_KEY` - Google Places API key
 - `$CODA_API_TOKEN`, `$CODA_DOC_ID`, `$CODA_TABLE_ID` - Coda access
 
+Also used: **`events-crawl/state.json`** — the memory of what Igor already added or ignored, so
+the same events are never offered twice. See the **Candidate memory** section near the end of this file.
+If it is missing, create it from `state.example.json`.
+
 ## Overview
 
 1. Read event source URLs from Vivaldi bookmarks (fresh each time)
 2. Open each source in browser and extract event links/info
 3. Verify ALL sources were crawled (mandatory checkpoint)
 4. Deduplicate against existing calendar
-5. Present ALL candidates in a numbered table
-6. User approves by number
-7. Add approved events using `events-add` skill
-8. Update Coda using `events-coda` skill
+5. Filter — including against **candidate memory** (`state.json`), so nothing Igor already
+   ignored is offered again
+6. Present ALL survivors in a numbered table
+7. User approves by number
+8. **Record the answer to `state.json`** — approved → `added`, everything else → `declined`
+9. Add approved events using `events-add` skill
+10. Update Coda using `events-coda` skill
 
 ## Step 1: Read Bookmarks
 
@@ -164,6 +171,52 @@ Remove duplicates from the candidate list.
 
 ## Step 5: Filter
 
+### Candidate memory — run this FIRST, before any human judgement
+
+**Igor should never be shown the same event twice.** If he was offered something and did not
+ask for it, that is a "no" and it must never resurface. This is enforced by
+`events-crawl/state.json` — do not re-derive the logic, just run the helper:
+
+```bash
+# write the deduplicated candidates to a temp file first:
+#   [{ "title": ..., "date": ..., "url": ..., "source_url": ..., "location": ... }]
+python3 "$SKILLS_DIR/events-crawl/candidates.py" filter \
+  "$SKILLS_DIR/events-crawl/state.json" /path/to/candidates.json > survivors.json
+```
+
+It prints `SHOW n / HIDE n` plus a one-line reason per hidden event to stderr, and the
+survivors as JSON on stdout. **Present only the survivors.** Mention the hidden count in the
+run summary (e.g. "12 suppressed by candidate memory") so the filter is visible, never silent.
+
+Matching is deliberately layered, because the same event reappears in different clothes:
+
+| Layer | Catches |
+| --- | --- |
+| Normalized URL | utm/fbclid params, `www.`, trailing slash, `/et/` vs `/en/` |
+| Normalized title **+ year** | same event surfaced via a different link (e.g. ECB links a Facebook post one year and the official site the next) |
+| `banned_series` | whole recurring series / organizers, by title phrase, scoped to one source or `*` |
+
+**The year is part of the key on purpose.** Declining *Cloud Tech Tallinn 2027* must NOT hide
+*Cloud Tech Tallinn 2028* — annual conferences are the norm here. Series bans ignore the year.
+
+### Blocked organizers — hard exclusions
+
+**Drop these silently, no matter how tech-relevant they look.** These override "when in doubt, INCLUDE" below — do NOT surface them as candidates for the user to judge.
+
+| Organizer | Identifying markers | Reason |
+| --- | --- | --- |
+| **Tallinn Tech Social** / IT Social | `itsocialevent.com`, Eventbrite organizer "Tallinn Tech Social", socials `@tech.social.event`, titles like "Tallinn Tech Mixer and Social (Tech / AI / Data / IT)" | Reported scam (2026-08-03): sells cheap tickets (€3–5) to events that don't happen. No named organizer, dead WhatsApp/Facebook/Discord channels, fake "5/5 on TrustPilot" badge linking to no reviews, AI-generated blog filler. Reported to Eventbrite by an attendee. Recurring weekly series — will keep reappearing on Eventbrite crawls. |
+| **MUD Events** | Eventbrite organizer "MUD Events" (`eventbrite.com/o/37845888663`), titles like "Business Networking - Startups, Investors & Tech", venue "TECH HUB - Telliskivi 60a/5" | Removed by user request (2026-08-03). Paid-ticket franchise networking: template description reused across cities ("part of a global series hosted in major cities worldwide"), no named host. Not a confirmed scam like the above, but not a real local community event either — don't list it. Recurring weekly series. |
+
+When a blocked organizer's event is found, note it in the run summary as blocked (so the user knows the filter fired) but never add it to the calendar.
+
+**Signals that should make you check an organizer before adding** (not auto-blocks — investigate, and ask the user if unsure):
+
+- Paid ticket for a generic "networking / mixer / social" event with **no named organizer or host** anywhere
+- Franchise-style copy ("part of a global series hosted in major cities worldwide") with a template description reused across cities
+- Rating/trust badges that don't link to a real profile
+- Community links (Discord/WhatsApp/Telegram) that are empty or have no activity
+
 Remove candidates that are NOT IT/tech/startup related. Keep events about:
 
 - Software development, programming, coding
@@ -220,7 +273,45 @@ Format:
 
 Then ask: **"Which events to add?"**
 
-## Step 7: Add Approved Events
+**Before asking, save the presented list verbatim** (same order as the numbers shown) — Step 7
+needs it to work out what was ignored:
+
+```bash
+cp survivors.json /tmp/presented.json
+```
+
+## Step 7: Record the answer (MANDATORY — do this before adding)
+
+Igor answers by number ("add 1 2 5", "1,4,9 skip others"). Everything presented and **not**
+picked counts as declined — silence is a "no", that is the whole point of this step.
+
+```bash
+python3 "$SKILLS_DIR/events-crawl/candidates.py" record \
+  "$SKILLS_DIR/events-crawl/state.json" /tmp/presented.json "add 1 2 5"
+```
+
+Approved → `added`; the rest → `declined` with `reason: "ignored"`. Run this **even if he picks
+everything**, and **even if he picks nothing** ("none of these" → all declined).
+
+Edge cases:
+
+- **He replies to only part of the batch, then adds more later** ("also add 5"): run
+  `unskip` for that one, then add it normally.
+  ```bash
+  python3 candidates.py unskip state.json "https://luma.com/xyz"   # url or title fragment
+  ```
+- **He never answers the batch at all** and asks for something unrelated: do NOT record
+  declines — an unanswered batch is not a rejection. Keep `presented.json` and ask next time
+  whether to drop it.
+- **He wants a whole recurring series gone** ("stop showing me this", "ban that organizer"):
+  ```bash
+  python3 candidates.py ban state.json "The Founders Room" "The Founders Room (paid weekly)" "*"
+  ```
+  Use the source bookmark URL instead of `*` to scope the ban to one source.
+- **A declined event turns out to be wanted**: `unskip` it. The file is plain JSON — hand-editing
+  or deleting an entry is perfectly fine.
+
+## Step 8: Add Approved Events
 
 For each approved event, use the `events-add` skill flow:
 
@@ -230,9 +321,9 @@ For each approved event, use the `events-add` skill flow:
 4. Check for duplicates (should be clean but double-check)
 5. Create calendar entry
 
-## Step 8: Update Coda
+## Step 9: Update Coda
 
-**Auto-proceed: after all approved events are added in Step 7, immediately proceed to this step without asking the user.**
+**Auto-proceed: after all approved events are added in Step 8, immediately proceed to this step without asking the user.**
 
 After all events are added, run the `events-coda` skill to:
 
@@ -241,8 +332,55 @@ After all events are added, run the `events-coda` skill to:
 3. Label new events
 4. Add missing links
 
+## Candidate memory — `state.json` schema
+
+Lives at `events-crawl/state.json`, next to this file. Committed to git (these are public
+events — no privacy concern, and history makes a bad entry easy to undo). Plain JSON on
+purpose: hand-editing and `git diff` are the recovery tools.
+
+```jsonc
+{
+  "added": [
+    { "url": "https://...", "title": "...", "year": 2026, "added_at": "2026-08-27",
+      "note": "optional — e.g. why a URL is suppressed" }
+  ],
+  "declined": [
+    { "url": "https://...", "title": "...", "year": 2026,
+      "reason": "ignored",           // "ignored" = presented and not picked
+      "declined_at": "2026-08-27" }
+  ],
+  "banned_series": [
+    { "match": "founders room",      // normalized phrase, matched as substring of the title
+      "label": "The Founders Room",  // human-readable, used in reports
+      "source": "*",                 // bookmark URL to scope the ban, or "*" for global
+      "banned_at": "2026-08-27",
+      "why": "Paid weekly generic founder networking" }
+  ]
+}
+```
+
+`match` must be run through the same `normalize()` the filter uses — the `ban` subcommand does
+this for you, so prefer it over editing by hand.
+
+Helper (`events-crawl/candidates.py`), all four subcommands:
+
+```bash
+python3 candidates.py filter state.json candidates.json > survivors.json
+python3 candidates.py record state.json presented.json "add 1 2 5"
+python3 candidates.py ban    state.json "<phrase>" "<label>" [source_url|*]
+python3 candidates.py unskip state.json "<url or title fragment>"
+```
+
 ## Common Pitfalls
 
+- **Presenting an event Igor already ignored** — the single biggest annoyance for him. Always run
+  the Step 5 `filter` before presenting, and always run the Step 7 `record` after he answers. If
+  `record` is skipped, every ignored event comes back on the next crawl.
+- **Recording declines for a batch he never answered** — an unanswered batch is not a rejection.
+  Only `record` once he has actually replied with a selection.
+- **Hand-writing a `banned_series` match with digits or punctuation in it** — `normalize()` strips
+  those, so the ban would never fire. Use the `ban` subcommand.
+- **Re-adding a blocked organizer** — check candidates against the blocklist in Step 5 before presenting. The blocked series are recurring, so they resurface on every Eventbrite crawl.
 - **Dismissing sources after a surface-level scan** — e.g. seeing only today's events on Fienta and giving up, or skipping ECB because it looks like a big table. Dig deeper!
 - **Saving snapshot files to the repo root** — use the `.playwright-mcp/` folder for snapshots (Playwright's default), don't save named snapshots to the working directory. If you need to save named snapshots, use `/tmp/` or another temp folder outside the repo.
 - **Forgetting to check next year** on sources like ECB that list events far in advance

@@ -1,0 +1,28 @@
+{
+  "added": [
+    {
+      "url": "https://luma.com/example",
+      "title": "Example AI Meetup Tallinn",
+      "year": 2026,
+      "added_at": "2026-08-27"
+    }
+  ],
+  "declined": [
+    {
+      "url": "https://example.com/some-conference",
+      "title": "Something Igor was offered and did not pick",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-08-27"
+    }
+  ],
+  "banned_series": [
+    {
+      "match": "founders room",
+      "label": "The Founders Room (paid weekly networking)",
+      "source": "*",
+      "banned_at": "2026-08-27",
+      "why": "Recurring paid generic founder networking - never relevant"
+    }
+  ]
+}
