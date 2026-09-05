@@ -42,6 +42,7 @@ this file. If `state.json` is missing, create it from `state.example.json`.
 8. **Record the answer to `state.json`** — everything presented and not picked → `declined`
 9. Add approved events using `events-add` skill
 10. Update Coda using `events-coda` skill
+11. **Commit and push `state.json`** — always, no asking (Step 10 below)
 
 ## Step 1: Read Bookmarks
 
@@ -139,6 +140,26 @@ candidate = { title, date, url, source_url, location (if available) }
   - **Use `browser_take_screenshot` instead** to read the channel visually
   - If you see an event mentioned in a screenshot, **navigate to the linked URL to confirm details** — a screenshot alone is not a substitute for having the actual event URL
   - **Newest messages are at the BOTTOM** — Discord channels load most-recent first. Scroll the message list UP (not down) repeatedly to load older posts. Keep scrolling until you've seen messages from at least the past month.
+- **WhatWhen** (`whatwhen.events`): the highest-yield single source — an Estonian tech-event
+  aggregator that pulls from Fienta, Luma, Meetup, Eventbrite, Tehnopol, TalTech,
+  inkubaator.tallinn.ee and more. Cards are clickable `div`s with **no `href`**, so scraping the
+  DOM gets you nothing. Hit its Supabase API instead and get every event in one request:
+
+  ```bash
+  KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0Z3Nna3NsYmJ4dWd2amN6dXZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNDIxMjgsImV4cCI6MjA5MzcxODEyOH0.scDPpQCPtEcRT5bvMC8JhE_NLZsbF4pjBRg-b7C09YU'
+  curl -s -X POST "https://ttgsgkslbbxugvjczuvr.supabase.co/rest/v1/rpc/search_events" \
+    -H "apikey: $KEY" -H "authorization: Bearer $KEY" \
+    -H 'content-type: application/json' -H 'content-profile: public' \
+    -H 'Origin: https://whatwhen.events' -d '{"q":""}'
+  ```
+
+  Returns ~100 events with `title`, `start_at`, `venue`, `city`, `source_event_url`,
+  `description`, `also_seen_on`. It's a public anon key baked into the page; if it stops working,
+  re-read it from a `rpc/search_events` request in `browser_network_requests`.
+
+  Two caveats: it lists **online and foreign** events too (filter to in-person Estonia), and its
+  records can be **phantom** — see the phantom-events warning in Step 6. Because it aggregates
+  sources you also crawl directly, expect heavy overlap; that overlap is useful corroboration.
 
 ## Step 3: Verify ALL Sources Were Crawled
 
@@ -260,7 +281,61 @@ Remove events about:
 
 ## Step 6: Present Candidates
 
-After ALL sources have been crawled, present the full candidate list as a numbered table:
+### Validate every link first (MANDATORY)
+
+**A URL that returns HTTP 200 is NOT proof the event exists.** Several Estonian sites soft-404 —
+they serve a "page not found" page *under a 200 status*. `taltech.ee` is the known offender:
+`taltech.ee/events/<slug>` answers 200 and redirects to `/palun-otsi-uuesti` ("please search
+again"). A status-code check sails straight past it.
+
+```bash
+python3 "$SKILLS_DIR/events-crawl/check_links.py" survivors.json
+```
+
+It flags `soft404-url` / `soft404-body` (dead), `http-4xx`, `tiny-Nb` (suspiciously small page)
+and `needs-browser`. Resolve every flag before presenting:
+
+- **`soft404-*`** → the page is dead. Find the real URL; if there isn't one, drop the candidate.
+- **`needs-browser`** (facebook / linkedin / instagram / discord) → **not** broken. These return
+  400 to cookie-less curl; confirm them in the logged-in Playwright browser instead.
+- **`tiny-Nb`** → usually a JS-rendered SPA, not an error. Check the `<title>` and
+  `og:description` in the raw HTML — that alone often confirms the event and yields a better
+  venue/date than the listing had (this is how MängudeÖÖ's "T1 Venue, 16+ speakers" was found).
+
+**Never present a link you have not seen resolve.** Igor clicks these to review events, and a
+dead link means both a wasted click and a candidate that may not exist at all.
+
+### Phantom events from aggregators
+
+Aggregator databases contain **invented events**. `whatwhen.events` is LLM-scraped and has been
+caught storing events whose URL was guessed from a slug pattern rather than followed from a real
+link. The tell-tale shape:
+
+```jsonc
+"source_event_url":    "https://taltech.ee/events/developer-conference-2026",
+"external_ticket_url": "https://taltech.ee/tickets/developer-conference-2026",
+"image_url":           "https://taltech.ee/images/developer-conference-2026.png",
+"description":         "Lehekülge ei leitud",   // the 404 page, saved as the description
+"also_seen_on":        []                        // nothing corroborates it
+```
+
+Three URLs that are the same slug in three different directories, a 404 page's text sitting in
+the `description`, and an empty `also_seen_on` — that event does not exist. Check `description`
+and `also_seen_on` on every aggregator-only candidate, and corroborate against a second source
+(the organizer's own site, ECB, Fienta) before presenting. Two such phantoms were caught in the
+2026-09-05 crawl ("Developer Conference 2026", "Startup Workshop"), both attributed to TalTech.
+
+After ALL sources have been crawled **and every link validated**, present the full candidate list
+as a numbered table.
+
+**NEVER bold, star, highlight or otherwise emphasise individual rows.** Every candidate gets
+identical formatting — plain text, no `**`, no ⭐/🔥, no "(recommended)" annotations, no
+reordering to put "interesting" ones first. Igor found this actively confusing: emphasis with no
+stated criterion reads like it means something official (already on calendar? higher priority?
+organizer he knows?) when it is really just the model's own hunch. He picks the events; the
+table's only job is to list them neutrally in date order. If something genuinely needs a caveat
+(unclear date, suspicious organizer, possible duplicate), say it in the notes **below** the
+table, not as formatting inside it.
 
 ```
 | # | Event | Date | Location | Source |
@@ -350,6 +425,37 @@ After all events are added, run the `events-coda` skill to:
 3. Label new events
 4. Add missing links
 
+## Step 10: Commit and push (MANDATORY — always, at the very end)
+
+**Auto-proceed and do NOT ask.** Igor has standing authorization to commit *and push* this
+skill's own changes at the end of a crawl — he asked for it explicitly, so pushing here is not
+an action that needs confirming.
+
+Every crawl mutates `events-crawl/state.json` (the declines recorded in Step 7). That file is
+the whole point of the candidate memory, and an uncommitted `state.json` is a silent time bomb:
+the next crawl on a fresh checkout re-offers everything Igor already passed on. Commit it.
+
+The skill lives in `~/Projects/tallinn-dev` and `~/.claude/skills/events-crawl` is a **symlink**
+into it, so git commands must run from the real repo — `git -C ~/.claude/skills/...` fails with
+*"pathspec is beyond a symbolic link"*.
+
+```bash
+cd ~/Projects/tallinn-dev
+git add events-crawl/
+git status --short          # sanity-check before committing
+git commit -m "events-crawl: record <N> declines from the <YYYY-MM-DD> crawl"
+git push
+```
+
+- Commit message convention is `events-crawl: <lowercase imperative summary>` — match the
+  existing log (`git log --oneline -5`).
+- **Stage only `events-crawl/`.** Never `git add -A`; unrelated work in the repo is not yours to
+  commit. If the crawl also changed `events-add/` or `events-coda/`, stage those too, but
+  nothing else.
+- If the working tree has unrelated modified files, leave them alone and say so in the summary.
+- If the push is rejected (someone else pushed first), `git pull --rebase` then push again.
+- Mention the commit hash in the run summary so Igor can find it.
+
 ## Candidate memory — `state.json` schema
 
 Lives at `events-crawl/state.json`, next to this file. Committed to git (these are public
@@ -395,6 +501,20 @@ python3 candidates.py unskip state.json "<url or title fragment>"
 - **Presenting an event Igor already ignored** — the single biggest annoyance for him. Always run
   the Step 5 `filter` before presenting, and always run the Step 7 `record` after he answers. If
   `record` is skipped, every ignored event comes back on the next crawl.
+- **Bolding or highlighting "interesting" rows in the candidate table** — never do this. Emphasis
+  with no stated criterion looks like it carries official meaning and just confuses the choice.
+  All rows get identical plain formatting; caveats go in the notes below the table. See Step 6.
+- **Presenting a link you never saw resolve** — run `check_links.py` before every batch. Trusting
+  HTTP 200 is not enough: `taltech.ee` soft-404s with a 200 to `/palun-otsi-uuesti`. Igor spotted
+  a dead link in the 2026-09-05 batch that a status-code check had passed.
+- **Trusting an aggregator's event without corroboration** — `whatwhen.events` has stored events
+  whose URL was guessed from a slug pattern, with the fetched 404 page saved as the
+  `description` and an empty `also_seen_on`. Always check those two fields. See Step 6.
+- **Ending a crawl with `state.json` uncommitted** — the declines silently don't persist for
+  anyone else, and the next crawl re-offers events Igor already rejected. Always finish with
+  Step 10 (commit **and** push); it is authorized, so don't stop to ask.
+- **Running git through the `~/.claude/skills/events-crawl` symlink** — fails with "pathspec is
+  beyond a symbolic link". `cd ~/Projects/tallinn-dev` first.
 - **Recording declines for a batch he never answered** — an unanswered batch is not a rejection.
   Only `record` once he has actually replied with a selection.
 - **Running `filter` without `calendar.json`** — it only applies `state.json` then, so events

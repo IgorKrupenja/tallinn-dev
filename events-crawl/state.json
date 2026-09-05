@@ -155,6 +155,143 @@
       "year": 2028,
       "reason": "ignored",
       "declined_at": "2026-08-27"
+    },
+    {
+      "url": "https://fienta.com/tehisaru-matinee-chatgpt-algajatele",
+      "title": "Tehisaru-matinée: ChatGPT algajatele (vene keeles)",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-09-05"
+    },
+    {
+      "url": "https://taltech.ee/events/developer-conference-2026",
+      "title": "Developer Conference 2026",
+      "year": 2026,
+      "reason": "phantom-event",
+      "declined_at": "2026-09-05",
+      "note": "whatwhen.events record with a guessed taltech.ee slug URL; page soft-404s (200 -> /palun-otsi-uuesti), its 404 text was stored as the description, also_seen_on empty. Event does not exist — do not re-offer."
+    },
+    {
+      "url": "https://inkubaator.tallinn.ee/en/events/meeskonna-juhtimine-2/",
+      "title": "Meeskonna juhtimise koolitus",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-09-05"
+    },
+    {
+      "url": "https://luma.com/h8exim18",
+      "title": "Mentor Bridge – business mentorship for youth entrepreneurs (Tallinn)",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-09-05"
+    },
+    {
+      "url": "https://www.facebook.com/events/955833617474579/",
+      "title": "ÜLEMISTE CITY | Nordic Business Forum 2026 ühisvaatamine",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-09-05"
+    },
+    {
+      "url": "https://luma.com/5bph1l5w",
+      "title": "Mentor Bridge – business mentorship for youth entrepreneurs (Tartu)",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-09-05"
+    },
+    {
+      "url": "https://fienta.com/jci-estonia-aastakonverents-2026-sild",
+      "title": "JCI Estonia Annual Conference 2026 BRIDGE",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-09-05"
+    },
+    {
+      "url": "https://luma.com/ntvjlcxg",
+      "title": "September Green Club Meeting",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-09-05"
+    },
+    {
+      "url": "https://inkubaator.tallinn.ee/en/events/kuidas-aitab-intellektuaalomand-kaitsta-loomingut-ja-tooteid-2/",
+      "title": "Kuidas aitab intellektuaalomand kaitsta loomingut ja tooteid",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-09-05"
+    },
+    {
+      "url": "https://inkubaator.tallinn.ee/en/events/ath-ja-labipolemine-ettevotluses-kuidas-hoida-tasakaalu/",
+      "title": "ATH ja läbipõlemine ettevõtluses – kuidas hoida tasakaalu",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-09-05"
+    },
+    {
+      "url": "https://taltech.ee/en/bec2026",
+      "title": "Baltic Electronics Conference 2026",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-09-05"
+    },
+    {
+      "url": "https://taltech.ee/events/startup-workshop",
+      "title": "Startup Workshop",
+      "year": 2026,
+      "reason": "phantom-event",
+      "declined_at": "2026-09-05",
+      "note": "whatwhen.events record with a guessed taltech.ee slug URL; page soft-404s (200 -> /palun-otsi-uuesti), its 404 text was stored as the description, also_seen_on empty. Event does not exist — do not re-offer."
+    },
+    {
+      "url": "https://fienta.com/seminar-on-smart-manufacturing-ai-insights",
+      "title": "Seminar on Smart Manufacturing & AI Insights",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-09-05"
+    },
+    {
+      "url": "https://www.eventbrite.com/e/les-inventions-scientifiques-francaises-tallinn-tickets-1976058427952",
+      "title": "Les inventions scientifiques françaises - Tallinn",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-09-05"
+    },
+    {
+      "url": "https://estonianelectronics.eu/en/ems-and-beyond-2026-on-december-3rd/",
+      "title": "EMS & BEYOND 2026",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-09-05"
+    },
+    {
+      "url": "https://inerme.org/2026/04/22/inerme-conference-2027/",
+      "title": "INERME Conference 2027",
+      "year": 2027,
+      "reason": "ignored",
+      "declined_at": "2026-09-05"
+    },
+    {
+      "url": "https://www.facebook.com/EMG.TalTech/posts/-exciting-news-for-the-diagnostics-communityat-the-ongoing-sdemped-2025-in-dalla/1331517828767640/",
+      "title": "IEEE SDEMPED 2027",
+      "year": 2027,
+      "reason": "ignored",
+      "declined_at": "2026-09-05"
+    },
+    {
+      "url": "https://fienta.com/tallinn-data-week-opening-day",
+      "title": "Tallinn Data Week - Opening Day",
+      "year": 2026,
+      "reason": "duplicate-of-calendar-event",
+      "declined_at": "2026-09-05",
+      "note": "Day 1 of 'Tallinn Data Week 2026' (2026-10-19 -> 10-23, https://www.tallinndataweek.ee/) already on the calendar. Approved in the 2026-09-05 batch but not created."
+    },
+    {
+      "url": "https://www.facebook.com/events/1266128934883465/",
+      "title": "Digit 2026",
+      "year": 2026,
+      "reason": "duplicate-of-calendar-event",
+      "declined_at": "2026-09-05",
+      "note": "Same event as calendar entry on 2026-10-09 (https://digit.dev/), which was titled 'Digit x PyCon 2026' and has been renamed to 'Digit 2026' — FB renamed it 2026-06-11 after PyCon Estonia 2026 was cancelled."
     }
   ],
   "banned_series": [
