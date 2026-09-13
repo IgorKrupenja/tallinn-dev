@@ -292,6 +292,63 @@
       "reason": "duplicate-of-calendar-event",
       "declined_at": "2026-09-05",
       "note": "Same event as calendar entry on 2026-10-09 (https://digit.dev/), which was titled 'Digit x PyCon 2026' and has been renamed to 'Digit 2026' — FB renamed it 2026-06-11 after PyCon Estonia 2026 was cancelled."
+    },
+    {
+      "url": "https://fienta.com/ebs-investment-club-stock-pitch-night",
+      "title": "EBS Investment Club - Stock Pitch Night",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-09-13"
+    },
+    {
+      "url": "https://fienta.com/tehnopol-soovitab-yeinternationali-demopaev-20-brandi-demod-ja-esitlused",
+      "title": "Tehnopol soovitab | YEInternationali demopäev",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-09-13"
+    },
+    {
+      "url": "https://fienta.com/hariduskonverents-insenerid-sunnivad-pohikoolis",
+      "title": "Hariduskonverents \"Insenerid sünnivad põhikoolis\"",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-09-13"
+    },
+    {
+      "url": "https://fienta.com/ebs-investment-club-jobhakdi",
+      "title": "EBS Investment Club - From Silicon Valley to AI Investing with Jo Bhakdi",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-09-13"
+    },
+    {
+      "url": "https://fienta.com/idee-superpower-200520",
+      "title": "IDEE + SUPERPOWER häkatonipäev",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-09-13"
+    },
+    {
+      "url": "https://luma.com/kmi1c7s1",
+      "title": "TECH & GOD Meetup - October",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-09-13"
+    },
+    {
+      "url": "https://www.linkedin.com/posts/aki-harima-b855b532_entrepreneurialecosystems-entrepreneurship-activity-7498738698809929729-5P24/",
+      "title": "Entrepreneurial Ecosystems in Times of Rapid Transformation",
+      "year": 2027,
+      "reason": "ignored",
+      "declined_at": "2026-09-13"
+    },
+    {
+      "url": "https://luma.com/estban-7i4l",
+      "title": "EstBAN October Pitch Event",
+      "year": 2026,
+      "reason": "duplicate-of-calendar-event",
+      "declined_at": "2026-09-13",
+      "note": "Same event as calendar entry 'EstBAN x KPMG Monthly Pitch: Defence Tech' on 2026-10-15 17:00-20:00 (from estban.ee/calendar/); different title and URL so neither filter layer matched."
     }
   ],
   "banned_series": [
