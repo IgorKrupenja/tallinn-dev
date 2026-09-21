@@ -349,6 +349,34 @@
       "reason": "duplicate-of-calendar-event",
       "declined_at": "2026-09-13",
       "note": "Same event as calendar entry 'EstBAN x KPMG Monthly Pitch: Defence Tech' on 2026-10-15 17:00-20:00 (from estban.ee/calendar/); different title and URL so neither filter layer matched."
+    },
+    {
+      "url": "https://luma.com/m90uvgtg",
+      "title": "Ehita ettevottele vundament, mis ei pragune",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-09-21"
+    },
+    {
+      "url": "https://luma.com/rtarvhjh",
+      "title": "Enty.io Presents: Networking Event for Tallinn Entrepreneurs",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-09-21"
+    },
+    {
+      "url": "https://www.tehnopol.ee/en/event/tehnopol-campus-science-competition-204353/",
+      "title": "Tehnopol campus science competition",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-09-21"
+    },
+    {
+      "url": "https://resilience.esa.int/archives/front_page_slideshow/scylight-conference-now-accepting-abstracts",
+      "title": "ScyLight Conference Tallinn 2027",
+      "year": 2027,
+      "reason": "ignored",
+      "declined_at": "2026-09-21"
     }
   ],
   "banned_series": [
