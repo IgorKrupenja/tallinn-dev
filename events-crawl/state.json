@@ -377,6 +377,95 @@
       "year": 2027,
       "reason": "ignored",
       "declined_at": "2026-09-21"
+    },
+    {
+      "url": "https://www.facebook.com/events/4465264420399293/",
+      "title": "Garage48 Empowering Women Hackathon",
+      "year": 2026,
+      "reason": "duplicate-of-calendar-event",
+      "declined_at": "2026-09-26",
+      "note": "FB event (Koodtech) for calendar entry 'kood/Garage48 Empowering Women Hackathon' (garage48.org/events/empoweringwomen), Oct 16-18"
+    },
+    {
+      "url": "https://fienta.com/mangudeoo-198640",
+      "title": "MängudeÖÖ konverents 2026",
+      "year": 2026,
+      "reason": "duplicate-of-calendar-event",
+      "declined_at": "2026-09-26",
+      "note": "Fienta ticket page for calendar entry 'MängudeÖÖ Conference' (mangudeoo.ee/en/konverents/), Oct 15-17"
+    },
+    {
+      "url": "https://fienta.com/software-defined-space-conference-2026",
+      "title": "Software Defined Space Conference 2026",
+      "year": 2026,
+      "reason": "duplicate-of-calendar-event",
+      "declined_at": "2026-09-26",
+      "note": "Fienta page for calendar entry 'The Software Defined Space Conference (SDSC) 2026', Oct 27-29"
+    },
+    {
+      "url": "https://fienta.com/atlassian-conference-in-northern-europe-182608",
+      "title": "Trinidad Wiseman’s Nordic Conference on Atlassian 2026",
+      "year": 2026,
+      "reason": "duplicate-of-calendar-event",
+      "declined_at": "2026-09-26",
+      "note": "Fienta page for calendar entry 'Nordic Conference on Atlassian 2026' (atlassian.twn.ee), Nov 27"
+    },
+    {
+      "url": "https://fienta.com/tallinn-ai-praktiline-koolitus-muugi-ja-kontoritootajad",
+      "title": "TALLINN - AI praktiline töötuba: müügi- ja kontoritöötajad",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-09-26"
+    },
+    {
+      "url": "https://fienta.com/valmistame-ai-abil-uusaastakingitusi",
+      "title": "Tehisaru-matinée: Valmistame AI abil uusaastakingitusi (töötuba vene keeles)",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-09-26"
+    },
+    {
+      "url": "https://fienta.com/tallinn-tehisaru-tootuba-finantsvaldkonnale-edasijoudnute-tase",
+      "title": "TALLINN - Tehisaru töötuba finantsvaldkonnale: edasijõudnute tase",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-09-26"
+    },
+    {
+      "url": "https://inkubaator.tallinn.ee/en/events/praktiline-turundamine-ai-ga/",
+      "title": "Praktiline turundamine AI-ga",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-09-26"
+    },
+    {
+      "url": "https://fienta.com/tallinn-ai-praktiline-koolitus-ehitushuvilisele-ja-iseehitajale",
+      "title": "TALLINN - AI praktiline töötuba: ehitushuvilisele ja iseehitajale",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-09-26"
+    },
+    {
+      "url": "https://fienta.com/tallinn-praktiline-ai-tootuba-mtu-dele",
+      "title": "TALLINN - Praktiline AI töötuba MTÜ-dele",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-09-26"
+    },
+    {
+      "url": "https://www.facebook.com/events/1583694949613264/",
+      "title": "Ülemiste City Business Breakfast x KONE: Turning Sustainability into Competitive Advantage",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-09-26"
+    },
+    {
+      "url": "https://fienta.com/206662",
+      "title": "Ülemiste City Business Breakfast: Turning Sustainability into Competitive Advantage",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-09-26",
+      "note": "Fienta ticket page of the same event as facebook.com/events/1583694949613264 (declined in the same batch)"
     }
   ],
   "banned_series": [
