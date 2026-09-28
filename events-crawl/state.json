@@ -466,6 +466,61 @@
       "reason": "ignored",
       "declined_at": "2026-09-26",
       "note": "Fienta ticket page of the same event as facebook.com/events/1583694949613264 (declined in the same batch)"
+    },
+    {
+      "url": "https://luma.com/wkhosx8d",
+      "title": "Mastermind & Speed Networking with Venture Visionaries",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-09-28"
+    },
+    {
+      "url": "https://fienta.com/turning-science-into-real-world-impact",
+      "title": "DeepTech Coffee morning | Turning Science Into Real-World Impact",
+      "year": 2026,
+      "reason": "duplicate-of-calendar-event",
+      "declined_at": "2026-09-28",
+      "note": "Fienta ticket page for calendar entry 'Coffee morning | Turning Science Into Real-World Impact' (2026-10-08, tehnopol.ee)"
+    },
+    {
+      "url": "https://startupestonia.ee/events/business-season-kickoff-tallinn-business-incubator/",
+      "title": "Business Season Kickoff @ Tallinn Business Incubator",
+      "year": 2026,
+      "reason": "duplicate-of-calendar-event",
+      "declined_at": "2026-09-28",
+      "note": "Startup Estonia page for calendar entry 'Ärihooaja Kickoff' (2026-09-29, inkubaator.tallinn.ee)"
+    },
+    {
+      "url": "https://startupestonia.ee/events/startup-estonia-legal-model-documents-lift99/",
+      "title": "Startup Estonia legal model documents @ Lift99",
+      "year": 2026,
+      "reason": "duplicate-of-calendar-event",
+      "declined_at": "2026-09-28",
+      "note": "Startup Estonia page for calendar entry \"Startup Estonia's Legal Model Documents: What's Changed?\" (2026-10-01, luma.com/ustb2dnu)"
+    },
+    {
+      "url": "https://teaduspark.ee/en/could-your-game-idea-become-a-real-business/",
+      "title": "Gaming Community: Could Your Game Idea Become a Real Business?",
+      "year": 2026,
+      "reason": "duplicate-of-calendar-event",
+      "declined_at": "2026-09-28",
+      "note": "Sparkup event merged into calendar entry 'Tartu Game Dev Meetup' (moved from 2026-09-30 to 2026-10-08)"
+    },
+    {
+      "url": "https://startupestonia.ee/events/professor-tim-minshalls-public-lecture/",
+      "title": "Professor Tim Minshall’s public lecture",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-09-28",
+      "note": "Startup Estonia page of the already-declined luma.com/7uysapu8 (Oxford and Cambridge Society Public Lecture, 2026-10-02)"
+    },
+    {
+      "url": "https://fienta.com/mastermind-speed-networking-koos-incommer-ja-venture-visionariesiga",
+      "title": "Mastermind & Speed Networking Incommer & Venture Visionaries",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-09-28",
+      "note": "Fienta page of luma.com/wkhosx8d, declined in the 2026-09-28 crawl"
     }
   ],
   "banned_series": [
