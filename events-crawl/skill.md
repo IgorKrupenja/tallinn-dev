@@ -14,8 +14,14 @@ Discover new IT events by crawling bookmarked event sources. Extracts candidates
 Note: Use `set -a && source ... && set +a` instead of `export $(grep ... | xargs)` because some env vars contain paths with spaces.
 
 ```bash
-set -a && source "${SKILLS_DIR:-$HOME/.claude/skills}/.env" && set +a
+set -a && source "$(dirname "$(realpath "${SKILLS_DIR:-$HOME/.claude/skills}/events-crawl")")/.env" && set +a
 ```
+
+The variables live in the **repo's** `.env` (the `tallinn-dev` root, next to the skill folders),
+not in `~/.claude/skills/.env`. The skill folders are symlinks into the repo, so `realpath` finds
+it from either location. `~/.claude/skills/.env` belongs to another repo and has no
+`BOOKMARKS_FOLDER`, `GOOGLE_CALENDAR_ID` or Coda variables: sourcing it makes Step 1 fail with
+`KeyError: 'BOOKMARKS_FOLDER'`.
 
 Required env vars:
 
@@ -236,7 +242,7 @@ The calendar is the source of truth for what is already added. Dump it once — 
 does the actual matching, so there is no separate hand-rolled dedup pass to get wrong:
 
 ```bash
-set -a && source "${SKILLS_DIR:-$HOME/.claude/skills}/.env" && set +a
+set -a && source "$(dirname "$(realpath "${SKILLS_DIR:-$HOME/.claude/skills}/events-crawl")")/.env" && set +a
 
 # MUST use --all-pages (default --max is only 10!) and RFC3339 dates with timezone.
 # Range: today → a few years out, because ECB lists conferences years in advance.

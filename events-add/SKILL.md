@@ -14,8 +14,12 @@ Add new events to Igor's "Estonia IT Events" Google Calendar with full content e
 Note: Use `set -a && source ... && set +a` instead of `export $(grep ... | xargs)` because some env vars contain paths with spaces.
 
 ```bash
-set -a && source "${SKILLS_DIR:-$HOME/.claude/skills}/.env" && set +a
+set -a && source "$(dirname "$(realpath "${SKILLS_DIR:-$HOME/.claude/skills}/events-add")")/.env" && set +a
 ```
+
+The variables live in the **repo's** `.env` (the `tallinn-dev` root, next to the skill folders),
+not in `~/.claude/skills/.env`, which has no `GOOGLE_CALENDAR_ID`. The skill folders are symlinks
+into the repo, so `realpath` finds it from either location.
 
 Required env vars:
 

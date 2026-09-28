@@ -14,10 +14,13 @@ Update event labels and links in the Estonia IT Events Coda table.
 Note: Use `set -a && source ... && set +a` instead of `export $(grep ... | xargs)` because some env vars contain paths with spaces.
 
 ```bash
-set -a && source "${SKILLS_DIR:-$HOME/.claude/skills}/.env" && set +a
+set -a && source "$(dirname "$(realpath "${SKILLS_DIR:-$HOME/.claude/skills}/events-coda")")/.env" && set +a
 ```
 
-Note: Uses `$SKILLS_DIR` env var (set in `.env`) with a fallback to `$HOME/.claude/skills`. Change `SKILLS_DIR` in `.env` to use with other AI tools (e.g. Cursor).
+The variables live in the **repo's** `.env` (the `tallinn-dev` root, next to the skill folders),
+not in `~/.claude/skills/.env`, which has no Coda variables. The skill folders are symlinks into
+the repo, so `realpath` finds it from either location. For other AI tools (e.g. Cursor), export
+`SKILLS_DIR` pointing at the folder that holds the skill folders before running this.
 
 Required env vars:
 
@@ -31,16 +34,27 @@ Required env vars:
 
 The Coda table syncs from Google Calendar, but it does not auto-refresh. You must manually trigger a sync before working with the data.
 
-1. Open the Coda page in the Playwright browser:
+1. Open the doc **logged in**. Coda is now Superhuman Docs, and opening `coda.io/d/...` directly
+   renders an anonymous view with no Refresh button. Go through the workspace first:
    ```
-   browser_navigate to: https://coda.io/d/Estonia-IT-events_dzkj730WT5a/
+   browser_navigate to: https://coda.io/docs        (lands in Igor's workspace, logged in)
+   browser_navigate to: https://docs.superhuman.com/d/Estonia-IT-events_dzkj730WT5a
    ```
-2. Take a snapshot and find the **Refresh** button (near the table header, next to the search icon).
-3. Click the **Refresh** button.
-4. The sync can take up to a couple of minutes. Take periodic snapshots to check progress — look for the status message (e.g. "Getting updates from Google Calendar...") to disappear and confirm new events have appeared in the table.
-5. Once the sync is complete, proceed to the next steps.
+2. Click the **Refresh** button next to the table's search icon
+   (`getByRole('button', { name: 'Refresh' })`).
+3. After ~40-60 s the UI says "Table last updated from Google Calendar just now". **The API lags
+   the UI by about another minute**, so before reading rows, poll
+   `GET https://coda.io/apis/v1/docs/$CODA_DOC_ID/tables/$CODA_TABLE_ID` until its `rowCount` or
+   `updatedAt` changes.
+4. Once the sync is complete, proceed to the next steps.
 
 **Note:** There is no API-based way to trigger this sync — the browser click is the only option.
+
+**The table mirrors Google Calendar.** To remove an event, delete it in the calendar
+(`gog calendar delete "$GOOGLE_CALENDAR_ID" <eventId> --force`; deleting a recurring master
+removes all instances), then Refresh. Never delete rows or set `Archived` through the API to get
+rid of an event: Igor rejected that, because synced rows are driven by the calendar. Step 1's
+archiving of events that already ended is the only `Archived` write.
 
 ### 1. Auto-Archive Past Events
 
@@ -130,6 +144,15 @@ curl -s -H "Authorization: Bearer $CODA_API_TOKEN" \
   "https://coda.io/apis/v1/docs/$CODA_DOC_ID/tables/$CODA_TABLE_ID/columns" \
   | jq -r '.items[] | select(.name == "Labels") | .format.options[] | .name' | sort
 ```
+
+**Only labels already in this list get saved.** Writing an unknown label returns HTTP 202 as if it
+worked, but the value is silently dropped, and `format.allowNewValues` is `null`, so the column
+format gives no warning. A new option has to be added in the UI: Labels column header → *Edit
+column* → scroll the select-list settings to the bottom → *Add option* (done for `Hardware` on
+2026-09-13). Playwright gotcha in that panel: the option fields are
+`textarea[placeholder="Add text"]` and `fill()` does not register there. Send one real keystroke
+with `browser_press_key`, then `pressSequentially` the rest, then blur and click away to commit
+(Escape discards it). Read the row back after writing a newly added label.
 
 ### 4. Remove "🔥 New" Label (Always Run This!)
 
