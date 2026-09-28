@@ -111,35 +111,95 @@ candidate = { title, date, url, source_url, location (if available) }
 - **Eventbrite** (`eventbrite.com`):
   - Paginate through **at least 4 pages** of results
   - Stop when you start seeing only Helsinki/Finland events
+  - curl is enough: every search page (`?page=N`) carries an `application/ld+json` ItemList with
+    name, startDate, location and url for each card. Results ran out at page 5 in Sep 2026.
+  - The CDN serves stale copies of event pages: two curls of one event returned Oct 9 and Oct 16.
+    When a date disagrees with the calendar, confirm it in the logged-in browser before acting.
+  - HackerX "Tallinn" is a template listed in 175+ cities (no venue, only €495+ employer tickets,
+    21:00 start). It is not a local event; leave it out.
 - **ECB** (`ecb.ee/calendar`): Goldmine of tech conferences.
   - Scan the full table for tech keywords (cyber, digital, AI, startup, blockchain, fintech, smart, IoT, cloud, etc.)
   - **Check ALL future years** in the year dropdown — click the search button to switch years. ECB lists events years in advance (2027, 2028, etc.)
   - Each table row has a "WWW" column (3rd column) with a direct link to the event website — **always extract that URL**, don't link to the ECB calendar page itself
+  - curl works for every year: `?filter=1&fyear=2027&fmonth=&fcity=&fvenue=`. The page holds one
+    table per month, so parse all of them, not just the first.
 - **Fienta** (`fienta.com`):
-  - Click "Load more" **at least 10 times** to see events up to 2 weeks out
+  - Click "Load more" **at least 10 times** to see events up to 2 weeks out. The UI is Estonian:
+    the button reads `Lae veel üritusi`. About 22 clicks reach three weeks out (~400 cards).
   - The first page only shows today's events
   - Scan all loaded events for tech relevance — tech events are mixed in among cultural ones
+  - Cards are `article.event-card` with the link inside. Save them all to a file with
+    `browser_evaluate` and scan the titles there instead of reading snapshots.
+  - Series cards say "+ mitu hilisemat aega" and link to `/s/<slug>`. The series HTML has one
+    JSON-LD Event block per session (startDate, endDate, per-session url, correct DST offsets).
 - **Luma** (`luma.com/tech`, `luma.com/discover`, specific calendars):
   - The 2-week limit applies **only to global/international event listings** (major events, popular calendars)
   - The **"Nearby Events" section shows local Tallinn events** — extract ALL of them regardless of date, since there are very few
   - **Nearby Events is lazy-loaded** — after navigating, you MUST `window.scrollTo(0, document.body.scrollHeight)` and wait ~2 seconds before reading the section. On first load `body.innerText` shows just the heading followed immediately by the footer (`"Nearby Events\nDiscoverPricingHelp\nGet the App"`) — that means the cards haven't fetched yet, NOT that there are no local events. Do not treat this as empty.
   - Nearby events render as `button` elements in snapshots without visible hrefs — **extract the `/url:` from the nested `link` element** (e.g. `/url: /yurdrxp2` → `https://luma.com/yurdrxp2`), or click the button to navigate
   - For **specific Luma calendars** (e.g. `luma.com/EstoniAI`), extract ALL upcoming events — these pages are small
+  - The API is faster than the page and needs no auth:
+    `https://api.lu.ma/discover/get-paginated-events?latitude=59.437&longitude=24.7536&pagination_limit=50`
+    returns every Tallinn-area event (follow `has_more` / `next_cursor`); add
+    `&discover_category_api_id=cat-tech` for `luma.com/tech`. For a calendar, read
+    `calendar.api_id` from the page's `__NEXT_DATA__`, then call
+    `api.lu.ma/calendar/get-items?calendar_api_id=<id>&period=future`. The full description is
+    `description_mirror` (ProseMirror JSON) in `__NEXT_DATA__`.
+  - **Private events never show up in discover.** Hosts' profiles list them. LIFT99's is
+    `api.lu.ma/user/profile/events-hosting?user_api_id=usr-iF2XpCioWMMbHzf&period=future`, which
+    is the only place Women in AI #5 appeared. Startup Estonia's event pages also link to private
+    Luma events.
+  - `start_at` is **UTC**. Estonia is UTC+3 from the last Sunday of March to the last Sunday of
+    October and UTC+2 otherwise, so use the offset of the event's own date.
+- **Meetup** (`meetup.com`): read `__NEXT_DATA__` → `props.pageProps.__APOLLO_STATE__`, the
+  `Event:*` keys. The find page only yields ~15-28 events; untitled `Event:*` stubs are the
+  recurring Daily Meetups social series. The Technology category (`&categoryId=546`) is a quick
+  cross-check. Group pages with no upcoming events show past ones instead, so check the dates.
 - **Facebook groups/feeds**:
-  - Feed content renders as empty `blockquote: Facebook` placeholders in accessibility snapshots — **use `browser_take_screenshot` instead** to read the feed visually
-  - For pages with an Events tab, check the Events tab first (snapshots work there), then **always also check the main feed** via screenshots — some pages post event links but don't create formal FB events (e.g. EstoniaWEB3, Palo Alto Club)
+  - Feed content renders as empty `blockquote: Facebook` placeholders in accessibility snapshots, but
+    DOM `innerText` via `browser_evaluate` works. Groups: iterate `[role=feed] > div`, and open them
+    with `?sorting_setting=CHRONOLOGICAL` (the default "Most relevant" order surfaces year-old
+    posts). Pages: climb from `[data-ad-preview=message]` to the ancestor containing "Write a
+    comment". Screenshots are the fallback.
+  - For pages with an Events tab, check the Events tab first, then **always also check the main feed**, because some pages post event links but don't create formal FB events (e.g. EstoniaWEB3, Palo Alto Club)
+  - Page events live at `/<page>/upcoming_hosted_events`, group events at `/groups/<id>/events`.
+    Scope `a[href*="/events/"]` to `[role=main]`: the notifications panel injects other people's
+    event links into every page.
+  - Page feeds load in a different order on each visit and `innerText` timestamps are obfuscated,
+    so the first post is not necessarily the newest. Confirm a post's age from a screenshot when it
+    matters.
   - **URL extraction**: event cards in snapshots have truncated titles but include a `link` element with `/url:` — always extract that URL. For feed posts with event links visible only in screenshots, navigate to the post to get the actual URL
 - **LinkedIn feeds**:
   - For company pages with an Events tab, check events first, then also scroll the posts feed
   - Snapshots generally work better than Facebook, but use `browser_take_screenshot` if content appears empty
+  - Company post pages: split `main.innerText` on `\nFeed post\n` (the 2026 DOM has no `data-urn`).
+    Profile activity pages (e.g. `laurikoobas/recent-activity`) lack that marker; split on the
+    author-name line instead, and read each post's relative age ("2w", "3mo").
 - **K-space** (`wiki.k-space.ee`):
   - Chaostreffs is a valid recurring event (every Thursday) — check the wiki page to confirm it's still running
   - Check the calendar's recurring event RRULE and **extend the UNTIL date to ~6 months from today** if needed (use `gog calendar update` with `--rrule` and `--scope all`)
   - Also check for one-off events on the events page
-- **Discord**: SPA that renders very poorly in accessibility snapshots.
-  - **Use `browser_take_screenshot` instead** to read the channel visually
-  - If you see an event mentioned in a screenshot, **navigate to the linked URL to confirm details** — a screenshot alone is not a substitute for having the actual event URL
-  - **Newest messages are at the BOTTOM** — Discord channels load most-recent first. Scroll the message list UP (not down) repeatedly to load older posts. Keep scrolling until you've seen messages from at least the past month.
+  - The wiki's public calendar lists everything, one-offs included:
+    `https://calendar.google.com/calendar/ical/m5irb4eke9npgk25nrb4qh41v4@group.calendar.google.com/public/basic.ics`
+- **Tehnopol**: the bookmarked `/sundmused/` redirects to an empty club page. The real list is
+  `https://www.tehnopol.ee/en/events/` (curl works).
+- **Startup Estonia** (`startupestonia.ee/our-event/`): the listing card shows the event date,
+  while the detail page's "Date:" is the publish date. Detail pages often link to a private Luma
+  event with the real time and venue.
+- **EstBAN** (`estban.ee/calendar/`): the page renders only the current month. Read its public
+  Google Calendar instead (decode the `eid` link parameter from base64 if the id ever changes):
+  `https://calendar.google.com/calendar/ical/estban.ee_qes79fn8gr41vas5j6cdtptfps%40group.calendar.google.com/public/basic.ics`
+- **Discord**: accessibility snapshots render poorly, but DOM extraction works.
+  - Each message is `li[id^="chat-messages-"]` with `time[datetime]` and `[id^="message-content-"]`,
+    so `browser_evaluate` gives exact timestamps. Screenshots are the fallback.
+  - **Newest messages are at the BOTTOM.** Set the message scroller's `scrollTop = 0` repeatedly
+    to load older posts, until you've seen at least the past month.
+  - Server events: click the `div.basicChannelRowLink__*` row that reads "N Event(s)" and read
+    `[role=dialog]`. `discord.com/events/...` links only bounce to #welcome.
+  - **Messages get edited.** The Tartu Game Dev Meetup moved from Sep 30 to Oct 8 through an edit
+    of the original post (2026-09-28). Re-read the message behind every calendar entry that came
+    from Discord, and move the entry when its date changed.
+  - If a message mentions an event elsewhere, **navigate to the linked URL to confirm details**.
 - **WhatWhen** (`whatwhen.events`): the highest-yield single source — an Estonian tech-event
   aggregator that pulls from Fienta, Luma, Meetup, Eventbrite, Tehnopol, TalTech,
   inkubaator.tallinn.ee and more. Cards are clickable `div`s with **no `href`**, so scraping the
@@ -160,6 +220,9 @@ candidate = { title, date, url, source_url, location (if available) }
   Two caveats: it lists **online and foreign** events too (filter to in-person Estonia), and its
   records can be **phantom** — see the phantom-events warning in Step 6. Because it aggregates
   sources you also crawl directly, expect heavy overlap; that overlap is useful corroboration.
+
+  It also stamps `inkubaator.tallinn.ee` events with a **placeholder date** (the 1st of the month,
+  06:00). Open the incubator page for the real date before presenting one.
 
 ## Step 3: Verify ALL Sources Were Crawled
 
@@ -533,5 +596,10 @@ python3 candidates.py unskip state.json "<url or title fragment>"
 - Including non-tech events (general ticketing sites list everything)
 - Not handling login walls gracefully (skip, don't crash)
 - **Assuming you're not logged in** to LinkedIn/Discord — the browser session is typically already authenticated. Always try navigating first.
+- **Converting UTC times with the summer offset in winter**: Luma's `start_at` is UTC, and Estonia
+  drops to UTC+2 on the last Sunday of October. The 2026-09-28 table showed an Oct 27 event at 19:00
+  instead of 18:00 because +3 was applied.
+- **Trusting a calendar entry sourced from a chat message**: Discord posts get edited when plans
+  change. Re-read them each crawl (see the Discord note above).
 - Not checking calendar for duplicates before presenting
 - Trying to extract full details during crawl phase (just get links + basic info, full extraction happens in add phase)

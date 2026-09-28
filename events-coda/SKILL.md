@@ -100,7 +100,9 @@ curl -s -H "Authorization: Bearer $CODA_API_TOKEN" \
          (.values.Link == "" or .values.Link == null))
       )
     | .values.Description as $desc
-    | ($desc | split("\n")[0]) as $firstLine
+    # Coda flattens the synced Description (no newlines), so take the leading URL by regex:
+    # split("\n")[0] would return the whole description.
+    | ((($desc // "") | capture("^\\s*(?<u>https?://\\S+)") | .u) // "No URL") as $url
     | {
         id: .id,
         name: .values.Name,
@@ -108,7 +110,7 @@ curl -s -H "Authorization: Bearer $CODA_API_TOKEN" \
         end: .values.End,
         labels: (.values.Labels // "❌ MISSING"),
         link: (.values.Link // "❌ MISSING"),
-        url_in_description: (if ($firstLine | test("^https?://")) then $firstLine else "No URL" end),
+        url_in_description: $url,
         location: .values.Location,
         description: $desc
       }

@@ -45,6 +45,16 @@ Use the `browser` tool (or `web_fetch` as fallback) to get the full event descri
 - ALWAYS click the "See more" button to expand the full text before extraction
 - Facebook truncates descriptions by default
 
+**Where the full text lives on other platforms:**
+
+- **Fienta**: `#desc .rich-text` keeps the line breaks; cut it where the ticket widget starts
+  ("Piletid" / "Tickets"). The JSON-LD `description` is flattened into one line.
+- **Luma**: `description_mirror` (ProseMirror JSON) in the page's `__NEXT_DATA__`; `start_at` and
+  `end_at` there are UTC.
+- **Fienta series** (`fienta.com/s/<slug>`, "+ mitu hilisemat aega"): create one calendar entry per
+  session, each with its own session URL. The series HTML has one JSON-LD Event block per session
+  with startDate, endDate and url.
+
 ### 2. Strict Content Policy
 
 - **DO NOT summarize** - use the complete original text
@@ -123,6 +133,11 @@ Full event description text here..."
 ```
 
 **⚠️ Date format also applies to `create`:** `--from` and `--to` MUST use RFC3339 with timezone (e.g. `2027-03-01T09:00:00+02:00`). Date-only format (`2027-03-01`) returns `Google API error (400 badRequest): Bad Request`. For all-day or multi-day events, pick reasonable start/end times (e.g. `09:00:00`–`18:00:00` on the appropriate days).
+
+**⚠️ The `+02:00` in these templates is winter time.** Estonia is UTC+3 from the last Sunday of
+March to the last Sunday of October. Use the offset of the event's own date: in 2026,
+`2026-10-19T17:30:00+03:00` but `2026-10-27T18:00:00+02:00`. A wrong offset puts the event an hour
+off. Convert UTC sources (Luma) with the same rule.
 
 ## Quality Checklist
 
