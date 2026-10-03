@@ -521,6 +521,85 @@
       "reason": "ignored",
       "declined_at": "2026-09-28",
       "note": "Fienta page of luma.com/wkhosx8d, declined in the 2026-09-28 crawl"
+    },
+    {
+      "url": "https://fienta.com/s/utleme-tehisarule-tere-tootuba",
+      "title": "\"Ütleme tehisarule tere\" töötuba (library AI workshop series)",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-10-03"
+    },
+    {
+      "url": "https://hve.ee/en/tartu-hydrogen-days-2026/",
+      "title": "Tartu Hydrogen Days 2026 (10th): From Molecules to Markets",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-10-03"
+    },
+    {
+      "url": "https://luma.com/5fh6467t",
+      "title": "Afterwork with Venture Visionaries",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-10-03"
+    },
+    {
+      "url": "https://fienta.com/estronautinspiratsioonipaev2026",
+      "title": "\"Eesti otsib estronauti 2026!\" Inspiratsioonipäev",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-10-03"
+    },
+    {
+      "url": "https://fienta.com/merehommik-governmentfleet",
+      "title": "Merehommik: Next Generation Government Fleet For the Baltic Sea",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-10-03"
+    },
+    {
+      "url": "https://fienta.com/208130",
+      "title": "Terviseinnovatsiooni tippkohtumine: järgmine tervisehüpe toimub koostöös",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-10-03"
+    },
+    {
+      "url": "https://fienta.com/203489",
+      "title": "Neidude iNspiratsioonipäev 2026",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-10-03"
+    },
+    {
+      "url": "https://inkubaator.tallinn.ee/en/events/lahinguvaljalt-ettevotlusse-combat-ready-kasvulugu-ja-oppetunnid/",
+      "title": "Lahinguväljalt ettevõtlusse: Combat Ready kasvulugu ja õppetunnid",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-10-03"
+    },
+    {
+      "url": "https://fienta.com/business-processes-management-forum-180933",
+      "title": "Business Processes Management Forum VI",
+      "year": 2027,
+      "reason": "ignored",
+      "declined_at": "2026-10-03"
+    },
+    {
+      "url": "https://www.tehnopol.ee/uritus/coffe-morning-turning-science-into-real-world-impact-204052/",
+      "title": "Coffee Morning: Turning Science into Real-World Impact (DeepTech Coffee Morning)",
+      "year": 2026,
+      "reason": "duplicate-of-calendar-event",
+      "declined_at": "2026-10-03",
+      "note": "Calendar has it as 'Coffee morning | Turning Science Into Real-World Impact' (tehnopol.ee/en/event/... URL), 8 Oct 09:30"
+    },
+    {
+      "url": "https://fienta.com/w3n-2026",
+      "title": "W3N 2026: Emerging Tech Festival",
+      "year": 2026,
+      "reason": "duplicate-of-calendar-event",
+      "declined_at": "2026-10-03",
+      "note": "Calendar has it as 'W3N 2026' (w3n.ee), 3 Dec"
     }
   ],
   "banned_series": [
