@@ -600,6 +600,35 @@
       "reason": "duplicate-of-calendar-event",
       "declined_at": "2026-10-03",
       "note": "Calendar has it as 'W3N 2026' (w3n.ee), 3 Dec"
+    },
+    {
+      "url": "https://www.facebook.com/events/1738138717411903/",
+      "title": "Tallinn Data Week: Fabric, from the people running it",
+      "year": 2026,
+      "reason": "duplicate-of-calendar-event",
+      "declined_at": "2026-10-09",
+      "note": "Palo Alto Club FB event for calendar entry 'Fabric, from the people running it' (2026-10-21, fienta.com/tdw-satellite-event-sparkle)"
+    },
+    {
+      "url": "https://fienta.com/204877",
+      "title": "Linnalaager „Inseneeriasügis“ 7–12-aastastele",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-10-09"
+    },
+    {
+      "url": "https://www.eventbrite.com/e/space-for-resilience-workshop-tallinn-estonia-tickets-2002216789315",
+      "title": "Space for Resilience workshop, Tallinn, Estonia",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-10-09"
+    },
+    {
+      "url": "https://fienta.com/meediahariduse-konverents-2025-ekraanid-ja-hinged-elu-digimaailmas-190255",
+      "title": "Meediahariduse konverents 2026: miks valeinfo petab ka targemaid?",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-10-09"
     }
   ],
   "banned_series": [
