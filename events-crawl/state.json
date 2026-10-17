@@ -629,6 +629,62 @@
       "year": 2026,
       "reason": "ignored",
       "declined_at": "2026-10-09"
+    },
+    {
+      "url": "https://www.facebook.com/events/1265802992402501/",
+      "title": "Seminar Kõrgkoolilt ettevõttele: Bränd, inimene ja tehisintellekt",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-10-17"
+    },
+    {
+      "url": "https://luma.com/wntbjssf",
+      "title": "Venture Visionaries Founders' Table #1 Tallinn: An Evening with Sten Saarniit",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-10-17"
+    },
+    {
+      "url": "https://fienta.com/epitsenter-2",
+      "title": "Epitsenter • MARGIT SUTROP: Tehisaru ja inimhing",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-10-17"
+    },
+    {
+      "url": "https://ambtallinn.esteri.it/en/news/dall_ambasciata/2026/10/italy-and-estonia-after-artemis-ii",
+      "title": "Third Italian-Estonian Space Conference",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-10-17"
+    },
+    {
+      "url": "https://taltech.ee/en/events/phd-thesis-defence-jelizaveta-vakarjuk",
+      "title": "PhD defence: Applying Privacy-Preserving Computations in Digital Identity (Jelizaveta Vakarjuk)",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-10-17"
+    },
+    {
+      "url": "https://fienta.com/tallinn-praktiline-tehisaru-tootuba-andmed-ja-ai",
+      "title": "Tallinn - Praktiline tehisaru töötuba: andmed ja AI",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-10-17"
+    },
+    {
+      "url": "https://luma.com/mz8hjxqb",
+      "title": "nAIne AI Dinner Club #1",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-10-17"
+    },
+    {
+      "url": "https://fienta.com/tallinn-praktiline-tootuba-ai-agendid-voimalused-riskid-ja-turvaline-kasutus",
+      "title": "TALLINN - Praktiline töötuba: AI agendid – võimalused, riskid ja turvaline kasutus",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-10-17"
     }
   ],
   "banned_series": [
