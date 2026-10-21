@@ -685,6 +685,28 @@
       "year": 2026,
       "reason": "ignored",
       "declined_at": "2026-10-17"
+    },
+    {
+      "url": "https://fienta.com/ai-business-cases",
+      "title": "Как заставить AI работать на ваш бизнес: 5 кейсов, которые можно применить сразу",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-10-21"
+    },
+    {
+      "url": "https://fienta.com/loim-seminar",
+      "title": "SEMINAR: Tark tekstiil ühes toas ehk LÕIM avab uksed",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-10-21"
+    },
+    {
+      "url": "https://www.meetup.com/startup-investor-accelerator-estonia/events/317025351/",
+      "title": "Startup Open Coffee and Angel Office hours In Person",
+      "year": 2026,
+      "reason": "duplicate-of-calendar-event",
+      "declined_at": "2026-10-21",
+      "note": "Same Oct 22 13:00 LIFT99 session as calendar entry 'Startup Open Coffee' (luma.com/o3iwbqkr)"
     }
   ],
   "banned_series": [
