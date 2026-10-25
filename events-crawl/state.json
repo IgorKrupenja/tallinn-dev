@@ -707,6 +707,100 @@
       "reason": "duplicate-of-calendar-event",
       "declined_at": "2026-10-21",
       "note": "Same Oct 22 13:00 LIFT99 session as calendar entry 'Startup Open Coffee' (luma.com/o3iwbqkr)"
+    },
+    {
+      "url": "https://www.meetup.com/fabric-user-group-estonia/events/317085912/",
+      "title": "Fabric User Group November: FabCon Europe 2026, debriefed in Tallinn",
+      "year": 2026,
+      "reason": "duplicate-of-calendar-event",
+      "declined_at": "2026-10-24",
+      "note": "Meetup page for calendar entry 'Fabric User Group Meetup November 2026' (fienta.com/208778), Nov 5"
+    },
+    {
+      "url": "https://healthandfood.taltech.ee/uritus/terviseinnovatsiooni-tippkohtumine-jargmine-tervisehupe-sunnib-koostoos/",
+      "title": "Terviseinnovatsiooni tippkohtumine: järgmine tervisehüpe sünnib koostöös",
+      "year": 2026,
+      "reason": "duplicate-of-declined-event",
+      "declined_at": "2026-10-24",
+      "note": "Same Nov 6 summit as fienta.com/208130, declined 2026-10-03"
+    },
+    {
+      "url": "https://www.facebook.com/events/873530349115438/",
+      "title": "Ülemiste City Future Forum 2027: Next Business Generation",
+      "year": 2027,
+      "reason": "duplicate-of-declined-event",
+      "declined_at": "2026-10-24",
+      "note": "FB event for the Apr 7-8 2027 forum declined 2026-08-27 (futureforum.ee)"
+    },
+    {
+      "url": "https://fienta.com/tallinn-praktiline-tehisaru-tootuba-disain-ja-multimeedia",
+      "title": "TALLINN - Praktiline tehisaru töötuba: disain ja multimeedia",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-10-25"
+    },
+    {
+      "url": "https://fienta.com/tallinn-praktilised-ai-toovotted-finantsjuhtidele-ja-raamatupidajatele-29102026",
+      "title": "TALLINN - Praktilised AI-töövõtted finantsjuhtidele ja raamatupidajatele",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-10-25"
+    },
+    {
+      "url": "https://fienta.com/tallinn-praktiline-tehisaru-tootuba-klienditeenindajatele1",
+      "title": "Tallinn - Praktiline tehisaru töötuba klienditeenindajatele",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-10-25"
+    },
+    {
+      "url": "https://fienta.com/tallinn-praktiline-tehisaru-tootuba-juhtidele",
+      "title": "TALLINN - Praktiline tehisaru töötuba juhtidele",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-10-25"
+    },
+    {
+      "url": "https://fienta.com/tallinn-toovood-ja-automatiseerimine-praktiline-ai-tootuba-kontoritoo-spetsialistidele1",
+      "title": "TALLINN - Töövood ja automatiseerimine: praktiline AI-töötuba kontoritöö spetsialistidele",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-10-25"
+    },
+    {
+      "url": "https://fienta.com/tallinn-tehisaru-sinu-ettevottes-kuidas-tegutseda-nii-et-tulemused-tulevad",
+      "title": "TALLINN - Tehisaru sinu ettevõttes: kuidas tegutseda nii, et tulemused tulevad",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-10-25"
+    },
+    {
+      "url": "https://inkubaator.tallinn.ee/en/events/disain-kohtub-teadusega-meretoostuse-uus-ajastu/",
+      "title": "Disain kohtub Teadusega: Meretööstuse uus ajastu",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-10-25"
+    },
+    {
+      "url": "https://luma.com/o5b6b30h",
+      "title": "Silver Käsper | Ettevõtete ostu-müügitehingute nõustaja (Superia)",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-10-25"
+    },
+    {
+      "url": "https://www.ulemistecity.ee/en/events/edufest-2026-take-a-bite-of-knowledge/",
+      "title": "EduFest 2026 – Take a Bite of Knowledge!",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-10-25"
+    },
+    {
+      "url": "https://luma.com/ra2ay9wq",
+      "title": "Grok Bot Workshop Tallinn",
+      "year": 2026,
+      "reason": "ignored",
+      "declined_at": "2026-10-25"
     }
   ],
   "banned_series": [
