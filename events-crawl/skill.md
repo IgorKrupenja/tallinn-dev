@@ -138,6 +138,11 @@ candidate = { title, date, url, source_url, location (if available) }
     `browser_evaluate` and scan the titles there instead of reading snapshots.
   - Series cards say "+ mitu hilisemat aega" and link to `/s/<slug>`. The series HTML has one
     JSON-LD Event block per session (startDate, endDate, per-session url, correct DST offsets).
+  - The public API beats clicking: `https://fienta.com/api/v1/public/events?starts_from=YYYY-MM-DD`
+    returns 1000 events from that date on, from every country (`country` and `city` are ignored).
+    Page by passing the last returned date as the next `starts_from`; six calls reached Feb 2027 on
+    2026-10-31. Keep Estonian venues by `venue`/`address`; `price_from_string` and
+    `organizer_name` help spot paid courses.
 - **Luma** (`luma.com/tech`, `luma.com/discover`, specific calendars):
   - The 2-week limit applies **only to global/international event listings** (major events, popular calendars)
   - The **"Nearby Events" section shows local Tallinn events** — extract ALL of them regardless of date, since there are very few
@@ -162,11 +167,13 @@ candidate = { title, date, url, source_url, location (if available) }
   recurring Daily Meetups social series. The Technology category (`&categoryId=546`) is a quick
   cross-check. Group pages with no upcoming events show past ones instead, so check the dates.
 - **Facebook groups/feeds**:
-  - Feed content renders as empty `blockquote: Facebook` placeholders in accessibility snapshots, but
-    DOM `innerText` via `browser_evaluate` works. Groups: iterate `[role=feed] > div`, and open them
-    with `?sorting_setting=CHRONOLOGICAL` (the default "Most relevant" order surfaces year-old
-    posts). Pages: climb from `[data-ad-preview=message]` to the ancestor containing "Write a
-    comment". Screenshots are the fallback.
+  - Feed content renders as empty `blockquote: Facebook` placeholders in accessibility snapshots.
+    Read post bodies from `[data-ad-preview=message]` with `browser_evaluate`, on pages and groups
+    alike: since Oct 2026 the `innerText` of `[role=feed] > div` is just "Facebook Facebook…".
+    Scroll in small steps and collect as you go, because the feed unloads posts. Open groups with
+    `?sorting_setting=CHRONOLOGICAL` (the default "Most relevant" order surfaces year-old posts).
+    For a post's links, climb from the message to the ancestor containing "Write a comment".
+    Screenshots are the fallback.
   - For pages with an Events tab, check the Events tab first, then **always also check the main feed**, because some pages post event links but don't create formal FB events (e.g. EstoniaWEB3, Palo Alto Club)
   - Page events live at `/<page>/upcoming_hosted_events`, group events at `/groups/<id>/events`.
     Scope `a[href*="/events/"]` to `[role=main]`: the notifications panel injects other people's
@@ -178,9 +185,10 @@ candidate = { title, date, url, source_url, location (if available) }
 - **LinkedIn feeds**:
   - For company pages with an Events tab, check events first, then also scroll the posts feed
   - Snapshots generally work better than Facebook, but use `browser_take_screenshot` if content appears empty
-  - Company post pages: split `main.innerText` on `\nFeed post\n` (the 2026 DOM has no `data-urn`).
-    Profile activity pages (e.g. `laurikoobas/recent-activity`) lack that marker; split on the
-    author-name line instead, and read each post's relative age ("2w", "3mo").
+  - Company post pages: split `main.innerText` on `/\nFeed post number \d+\n/` (Oct 2026; the DOM
+    has no `data-urn`). Profile activity pages (e.g. `laurikoobas/recent-activity`) split on
+    `\nFeed post\n`. Read each post's relative age ("2w", "3mo"): company feeds sort by "Top", not
+    by date.
 - **K-space** (`wiki.k-space.ee`):
   - Chaostreffs is a valid recurring event (every Thursday) — check the wiki page to confirm it's still running
   - Check the calendar's recurring event RRULE and **extend the UNTIL date to ~6 months from today** if needed (use `gog calendar update` with `--rrule` and `--scope all`)
