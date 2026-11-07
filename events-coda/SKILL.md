@@ -40,12 +40,14 @@ The Coda table syncs from Google Calendar, but it does not auto-refresh. You mus
    browser_navigate to: https://coda.io/docs        (lands in Igor's workspace, logged in)
    browser_navigate to: https://docs.superhuman.com/d/Estonia-IT-events_dzkj730WT5a
    ```
-2. Open the dropdown next to **View Pack details** in the table header and pick **Refresh from
-   Google Calendar** (the standalone Refresh button was gone by Nov 2026).
-   **Since 2026-11-07 the Google Calendar Pack needs the Pro plan** ("The Google Calendar Pack
-   requires a subscription" under the table title). Refresh then does nothing: `rowCount` and
-   `updatedAt` stayed unchanged for 2.5 minutes, so new calendar events never reach Coda. Until
-   Igor upgrades or replaces the sync, skip the labeling steps and say so.
+2. Click the **Refresh** button next to the table's search icon
+   (`getByRole('button', { name: 'Refresh' })`). If the header shows **Try again** instead
+   (after an error such as "Google Calendar couldn't receive edits from Superhuman Docs"), click
+   that: on 2026-11-07 it ran the pull and the new rows arrived about 40 s later, although the
+   error text stayed.
+   If the table says "The Google Calendar Pack requires a subscription" and shows **View Pack
+   details** instead of Refresh, the workspace billing has lapsed (on 2026-11-07 Igor's card had
+   changed). Refresh does nothing then. Ask Igor to fix billing; never upgrade or pay yourself.
 3. After ~40-60 s the UI says "Table last updated from Google Calendar just now". **The API lags
    the UI by about another minute**, so before reading rows, poll
    `GET https://coda.io/apis/v1/docs/$CODA_DOC_ID/tables/$CODA_TABLE_ID` until its `rowCount` or
