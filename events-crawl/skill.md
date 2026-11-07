@@ -75,6 +75,11 @@ jq -r "$FILTER" "$BOOKMARKS_FILE"
 
 For each bookmark URL, open it in the browser and figure out what's on the page. Don't rely on hardcoded per-site logic — read the snapshot and extract events based on what you see.
 
+**Browser:** use `playwright-cli -s=personal` (Igor's CLAUDE.md). The `browser_evaluate` and other
+`browser_*` names in this file map to its `eval`, `goto` and `snapshot` commands. That profile got
+its Facebook, LinkedIn, Discord and Superhuman Docs logins on 2026-11-07; earlier crawls ran in the
+Playwright MCP profile, so a fresh profile means asking Igor to sign in again.
+
 **Collect ALL candidates across ALL sources before presenting to user.**
 
 Keep a running list of candidates:
@@ -143,6 +148,8 @@ candidate = { title, date, url, source_url, location (if available) }
     Page by passing the last returned date as the next `starts_from`; six calls reached Feb 2027 on
     2026-10-31. Keep Estonian venues by `venue`/`address`; `price_from_string` and
     `organizer_name` help spot paid courses.
+    The bookmark is `city=tallinn`, so present only Tallinn venues: on 2026-11-07 the API also
+    returned about 100 Arunädal (Eesti.ai AI week) sessions all over Estonia.
 - **Luma** (`luma.com/tech`, `luma.com/discover`, specific calendars):
   - The 2-week limit applies **only to global/international event listings** (major events, popular calendars)
   - The **"Nearby Events" section shows local Tallinn events** — extract ALL of them regardless of date, since there are very few
@@ -237,6 +244,9 @@ candidate = { title, date, url, source_url, location (if available) }
 
   It also stamps `inkubaator.tallinn.ee` events with a **placeholder date** (the 1st of the month,
   06:00). Open the incubator page for the real date before presenting one.
+
+  Its times for Tehnopol events run an hour early (09:30 shown as 08:30, 14:00 as 13:00, seen
+  2026-11-07). Take times from tehnopol.ee.
 
 ## Step 3: Verify ALL Sources Were Crawled
 
