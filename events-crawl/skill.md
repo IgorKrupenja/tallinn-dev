@@ -14,14 +14,13 @@ Discover new IT events by crawling bookmarked event sources. Extracts candidates
 Note: Use `set -a && source ... && set +a` instead of `export $(grep ... | xargs)` because some env vars contain paths with spaces.
 
 ```bash
-set -a && source "$(dirname "$(realpath "${SKILLS_DIR:-$HOME/.claude/skills}/events-crawl")")/.env" && set +a
+export TALLINN_DEV_ROOT="${TALLINN_DEV_ROOT:-$HOME/Projects/tallinn-dev}"
+set -a && source "$TALLINN_DEV_ROOT/.env" && set +a
 ```
 
-The variables live in the **repo's** `.env` (the `tallinn-dev` root, next to the skill folders),
-not in `~/.claude/skills/.env`. The skill folders are symlinks into the repo, so `realpath` finds
-it from either location. `~/.claude/skills/.env` belongs to another repo and has no
-`BOOKMARKS_FOLDER`, `GOOGLE_CALENDAR_ID` or Coda variables: sourcing it makes Step 1 fail with
-`KeyError: 'BOOKMARKS_FOLDER'`.
+The variables live in the repository root's `.env`. The default root is `~/Projects/tallinn-dev`;
+set `TALLINN_DEV_ROOT` if the repository is elsewhere. This avoids relying on Claude's or Codex's
+skill-discovery directory and uses the same configuration from either agent.
 
 Required env vars:
 
@@ -75,10 +74,11 @@ jq -r "$FILTER" "$BOOKMARKS_FILE"
 
 For each bookmark URL, open it in the browser and figure out what's on the page. Don't rely on hardcoded per-site logic — read the snapshot and extract events based on what you see.
 
-**Browser:** use `playwright-cli -s=personal` (Igor's CLAUDE.md). The `browser_evaluate` and other
-`browser_*` names in this file map to its `eval`, `goto` and `snapshot` commands. That profile got
-its Facebook, LinkedIn, Discord and Superhuman Docs logins on 2026-11-07; earlier crawls ran in the
-Playwright MCP profile, so a fresh profile means asking Igor to sign in again.
+**Browser:** use the shared local session `playwright-cli -s=personal` from either agent. It
+reuses the configured persistent profile. Use `goto` to navigate, `snapshot` to inspect, `eval` for
+DOM extraction, `screenshot` for visual checks, `requests`/`request` for network details, and
+`click` or `run-code` for interactions. If a page asks for sign-in, pause and ask Igor to sign in
+through his normal browser; do not switch to a fresh profile.
 
 **Collect ALL candidates across ALL sources before presenting to user.**
 
@@ -140,7 +140,7 @@ candidate = { title, date, url, source_url, location (if available) }
   - The first page only shows today's events
   - Scan all loaded events for tech relevance — tech events are mixed in among cultural ones
   - Cards are `article.event-card` with the link inside. Save them all to a file with
-    `browser_evaluate` and scan the titles there instead of reading snapshots.
+    `playwright-cli eval` and scan the titles there instead of reading snapshots.
   - Series cards say "+ mitu hilisemat aega" and link to `/s/<slug>`. The series HTML has one
     JSON-LD Event block per session (startDate, endDate, per-session url, correct DST offsets).
   - The public API beats clicking: `https://fienta.com/api/v1/public/events?starts_from=YYYY-MM-DD`
@@ -175,7 +175,7 @@ candidate = { title, date, url, source_url, location (if available) }
   cross-check. Group pages with no upcoming events show past ones instead, so check the dates.
 - **Facebook groups/feeds**:
   - Feed content renders as empty `blockquote: Facebook` placeholders in accessibility snapshots.
-    Read post bodies from `[data-ad-preview=message]` with `browser_evaluate`, on pages and groups
+    Read post bodies from `[data-ad-preview=message]` with `playwright-cli eval`, on pages and groups
     alike: since Oct 2026 the `innerText` of `[role=feed] > div` is just "Facebook Facebook…".
     Scroll in small steps and collect as you go, because the feed unloads posts. Open groups with
     `?sorting_setting=CHRONOLOGICAL` (the default "Most relevant" order surfaces year-old posts).
@@ -191,7 +191,7 @@ candidate = { title, date, url, source_url, location (if available) }
   - **URL extraction**: event cards in snapshots have truncated titles but include a `link` element with `/url:` — always extract that URL. For feed posts with event links visible only in screenshots, navigate to the post to get the actual URL
 - **LinkedIn feeds**:
   - For company pages with an Events tab, check events first, then also scroll the posts feed
-  - Snapshots generally work better than Facebook, but use `browser_take_screenshot` if content appears empty
+  - Snapshots generally work better than Facebook, but use `playwright-cli screenshot` if content appears empty
   - Company post pages: split `main.innerText` on `/\nFeed post number \d+\n/` (Oct 2026; the DOM
     has no `data-urn`). Profile activity pages (e.g. `laurikoobas/recent-activity`) split on
     `\nFeed post\n`. Read each post's relative age ("2w", "3mo"): company feeds sort by "Top", not
@@ -212,7 +212,7 @@ candidate = { title, date, url, source_url, location (if available) }
   `https://calendar.google.com/calendar/ical/estban.ee_qes79fn8gr41vas5j6cdtptfps%40group.calendar.google.com/public/basic.ics`
 - **Discord**: accessibility snapshots render poorly, but DOM extraction works.
   - Each message is `li[id^="chat-messages-"]` with `time[datetime]` and `[id^="message-content-"]`,
-    so `browser_evaluate` gives exact timestamps. Screenshots are the fallback.
+    so `playwright-cli eval` gives exact timestamps. Screenshots are the fallback.
   - **Newest messages are at the BOTTOM.** Set the message scroller's `scrollTop = 0` repeatedly
     to load older posts, until you've seen at least the past month.
   - Server events: click the `div.basicChannelRowLink__*` row that reads "N Event(s)" and read
@@ -236,7 +236,7 @@ candidate = { title, date, url, source_url, location (if available) }
 
   Returns ~100 events with `title`, `start_at`, `venue`, `city`, `source_event_url`,
   `description`, `also_seen_on`. It's a public anon key baked into the page; if it stops working,
-  re-read it from a `rpc/search_events` request in `browser_network_requests`.
+  re-read it from a `rpc/search_events` request in `playwright-cli requests`.
 
   Two caveats: it lists **online and foreign** events too (filter to in-person Estonia), and its
   records can be **phantom** — see the phantom-events warning in Step 6. Because it aggregates
@@ -260,7 +260,8 @@ The calendar is the source of truth for what is already added. Dump it once — 
 does the actual matching, so there is no separate hand-rolled dedup pass to get wrong:
 
 ```bash
-set -a && source "$(dirname "$(realpath "${SKILLS_DIR:-$HOME/.claude/skills}/events-crawl")")/.env" && set +a
+export TALLINN_DEV_ROOT="${TALLINN_DEV_ROOT:-$HOME/Projects/tallinn-dev}"
+set -a && source "$TALLINN_DEV_ROOT/.env" && set +a
 
 # MUST use --all-pages (default --max is only 10!) and RFC3339 dates with timezone.
 # Range: today → a few years out, because ECB lists conferences years in advance.
@@ -288,8 +289,9 @@ one he was offered and passed on. If he was offered something and did not ask fo
 # write the crawled candidates to /tmp/candidates.json first:
 #   [{ "title": ..., "date": ..., "url": ..., "source_url": ..., "location": ... }]
 # /tmp/calendar.json is the dump from Step 4.
-python3 "$SKILLS_DIR/events-crawl/candidates.py" filter \
-  "$SKILLS_DIR/events-crawl/state.json" /tmp/candidates.json /tmp/calendar.json > survivors.json
+TALLINN_DEV_ROOT="${TALLINN_DEV_ROOT:-$HOME/Projects/tallinn-dev}"
+python3 "$TALLINN_DEV_ROOT/events-crawl/candidates.py" filter \
+  "$TALLINN_DEV_ROOT/events-crawl/state.json" /tmp/candidates.json /tmp/calendar.json > survivors.json
 ```
 
 It prints `SHOW n / HIDE n` plus a one-line reason per hidden event to stderr, and the
@@ -376,7 +378,8 @@ they serve a "page not found" page *under a 200 status*. `taltech.ee` is the kno
 again"). A status-code check sails straight past it.
 
 ```bash
-python3 "$SKILLS_DIR/events-crawl/check_links.py" survivors.json
+TALLINN_DEV_ROOT="${TALLINN_DEV_ROOT:-$HOME/Projects/tallinn-dev}"
+python3 "$TALLINN_DEV_ROOT/events-crawl/check_links.py" survivors.json
 ```
 
 It flags `soft404-url` / `soft404-body` (dead), `http-4xx`, `tiny-Nb` (suspiciously small page)
@@ -463,8 +466,9 @@ Igor answers by number ("add 1 2 5", "1,4,9 skip others"). Everything presented 
 picked counts as declined — silence is a "no", that is the whole point of this step.
 
 ```bash
-python3 "$SKILLS_DIR/events-crawl/candidates.py" record \
-  "$SKILLS_DIR/events-crawl/state.json" /tmp/presented.json "add 1 2 5"
+TALLINN_DEV_ROOT="${TALLINN_DEV_ROOT:-$HOME/Projects/tallinn-dev}"
+python3 "$TALLINN_DEV_ROOT/events-crawl/candidates.py" record \
+  "$TALLINN_DEV_ROOT/events-crawl/state.json" /tmp/presented.json "add 1 2 5"
 ```
 
 The rest → `declined` with `reason: "ignored"`. **Approved events are not written to
@@ -512,35 +516,25 @@ After all events are added, run the `events-coda` skill to:
 3. Label new events
 4. Add missing links
 
-## Step 10: Commit and push (MANDATORY — always, at the very end)
+## Step 10: Commit local state (MANDATORY; never push automatically)
 
-**Auto-proceed and do NOT ask.** Igor has standing authorization to commit *and push* this
-skill's own changes at the end of a crawl — he asked for it explicitly, so pushing here is not
-an action that needs confirming.
+Every crawl changes `events-crawl/state.json` when the user answers the presented batch. Commit
+that state locally after recording the user's answer so declined events stay suppressed on the next
+crawl. Never push unless Igor explicitly authorizes that push.
 
-Every crawl mutates `events-crawl/state.json` (the declines recorded in Step 7). That file is
-the whole point of the candidate memory, and an uncommitted `state.json` is a silent time bomb:
-the next crawl on a fresh checkout re-offers everything Igor already passed on. Commit it.
-
-The skill lives in `~/Projects/tallinn-dev` and `~/.claude/skills/events-crawl` is a **symlink**
-into it, so git commands must run from the real repo — `git -C ~/.claude/skills/...` fails with
-*"pathspec is beyond a symbolic link"*.
+Run git from the canonical repository root:
 
 ```bash
-cd ~/Projects/tallinn-dev
-git add events-crawl/
+cd "${TALLINN_DEV_ROOT:-$HOME/Projects/tallinn-dev}"
+git add events-crawl/state.json
 git status --short          # sanity-check before committing
 git commit -m "events-crawl: record <N> declines from the <YYYY-MM-DD> crawl"
-git push
 ```
 
-- Commit message convention is `events-crawl: <lowercase imperative summary>` — match the
-  existing log (`git log --oneline -5`).
-- **Stage only `events-crawl/`.** Never `git add -A`; unrelated work in the repo is not yours to
-  commit. If the crawl also changed `events-add/` or `events-coda/`, stage those too, but
-  nothing else.
+- Commit message convention is `events-crawl: <lowercase imperative summary>` — match the existing log (`git log --oneline -5`).
+- Stage only `events-crawl/state.json`; never use `git add -A`.
 - If the working tree has unrelated modified files, leave them alone and say so in the summary.
-- If the push is rejected (someone else pushed first), `git pull --rebase` then push again.
+- Do not push without explicit authorization for that push.
 - Mention the commit hash in the run summary so Igor can find it.
 
 ## Candidate memory — `state.json` schema
@@ -599,9 +593,9 @@ python3 candidates.py unskip state.json "<url or title fragment>"
   `description` and an empty `also_seen_on`. Always check those two fields. See Step 6.
 - **Ending a crawl with `state.json` uncommitted** — the declines silently don't persist for
   anyone else, and the next crawl re-offers events Igor already rejected. Always finish with
-  Step 10 (commit **and** push); it is authorized, so don't stop to ask.
-- **Running git through the `~/.claude/skills/events-crawl` symlink** — fails with "pathspec is
-  beyond a symbolic link". `cd ~/Projects/tallinn-dev` first.
+  Step 10 (local commit). Push only after Igor explicitly authorizes that push.
+- **Running git through an agent-skill symlink** — run git from the canonical repository root:
+  `cd "${TALLINN_DEV_ROOT:-$HOME/Projects/tallinn-dev}"`.
 - **Recording declines for a batch he never answered** — an unanswered batch is not a rejection.
   Only `record` once he has actually replied with a selection.
 - **Running `filter` without `calendar.json`** — it only applies `state.json` then, so events

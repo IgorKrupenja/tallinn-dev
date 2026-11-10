@@ -14,12 +14,13 @@ Add new events to Igor's "Estonia IT Events" Google Calendar with full content e
 Note: Use `set -a && source ... && set +a` instead of `export $(grep ... | xargs)` because some env vars contain paths with spaces.
 
 ```bash
-set -a && source "$(dirname "$(realpath "${SKILLS_DIR:-$HOME/.claude/skills}/events-add")")/.env" && set +a
+export TALLINN_DEV_ROOT="${TALLINN_DEV_ROOT:-$HOME/Projects/tallinn-dev}"
+set -a && source "$TALLINN_DEV_ROOT/.env" && set +a
 ```
 
-The variables live in the **repo's** `.env` (the `tallinn-dev` root, next to the skill folders),
-not in `~/.claude/skills/.env`, which has no `GOOGLE_CALENDAR_ID`. The skill folders are symlinks
-into the repo, so `realpath` finds it from either location.
+The variables live in the repository root's `.env`. The default root is `~/Projects/tallinn-dev`;
+set `TALLINN_DEV_ROOT` if the repository is elsewhere. This works the same from Claude Code and Codex,
+whether the skill folders are linked into an agent's discovery directory or used from the repository.
 
 Required env vars:
 

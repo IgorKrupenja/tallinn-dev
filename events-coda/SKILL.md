@@ -14,13 +14,13 @@ Update event labels and links in the Estonia IT Events Coda table.
 Note: Use `set -a && source ... && set +a` instead of `export $(grep ... | xargs)` because some env vars contain paths with spaces.
 
 ```bash
-set -a && source "$(dirname "$(realpath "${SKILLS_DIR:-$HOME/.claude/skills}/events-coda")")/.env" && set +a
+export TALLINN_DEV_ROOT="${TALLINN_DEV_ROOT:-$HOME/Projects/tallinn-dev}"
+set -a && source "$TALLINN_DEV_ROOT/.env" && set +a
 ```
 
-The variables live in the **repo's** `.env` (the `tallinn-dev` root, next to the skill folders),
-not in `~/.claude/skills/.env`, which has no Coda variables. The skill folders are symlinks into
-the repo, so `realpath` finds it from either location. For other AI tools (e.g. Cursor), export
-`SKILLS_DIR` pointing at the folder that holds the skill folders before running this.
+The variables live in the repository root's `.env`. The default root is `~/Projects/tallinn-dev`;
+set `TALLINN_DEV_ROOT` if the repository is elsewhere. The same setting works from Claude Code and
+Codex, whether the skill folders are linked into an agent's discovery directory or used from the repository.
 
 Required env vars:
 
@@ -37,11 +37,12 @@ The Coda table syncs from Google Calendar, but it does not auto-refresh. You mus
 1. Open the doc **logged in**. Coda is now Superhuman Docs, and opening `coda.io/d/...` directly
    renders an anonymous view with no Refresh button. Go through the workspace first:
    ```
-   browser_navigate to: https://coda.io/docs        (lands in Igor's workspace, logged in)
-   browser_navigate to: https://docs.superhuman.com/d/Estonia-IT-events_dzkj730WT5a
+   playwright-cli -s=personal goto https://coda.io/docs        (opens the configured personal session)
+   playwright-cli -s=personal goto https://docs.superhuman.com/d/Estonia-IT-events_dzkj730WT5a
    ```
-2. Click the **Refresh** button next to the table's search icon
-   (`getByRole('button', { name: 'Refresh' })`). If the header shows **Try again** instead
+2. Take a fresh snapshot with `playwright-cli -s=personal snapshot`, then click the exact **Refresh**
+   button reference. If needed, use `playwright-cli -s=personal run-code` with
+   `page.getByRole('button', { name: 'Refresh' })`. If the header shows **Try again** instead
    (after an error such as "Google Calendar couldn't receive edits from Superhuman Docs"), click
    that: on 2026-11-07 it ran the pull and the new rows arrived about 40 s later, although the
    error text stayed.
@@ -157,7 +158,8 @@ format gives no warning. A new option has to be added in the UI: Labels column h
 column* → scroll the select-list settings to the bottom → *Add option* (done for `Hardware` on
 2026-09-13). Playwright gotcha in that panel: the option fields are
 `textarea[placeholder="Add text"]` and `fill()` does not register there. Send one real keystroke
-with `browser_press_key`, then `pressSequentially` the rest, then blur and click away to commit
+with `playwright-cli -s=personal run-code` and the locator's `press()` method, then use
+`pressSequentially()` for the rest, then blur and click away to commit
 (Escape discards it). Read the row back after writing a newly added label.
 
 ### 4. Remove "🔥 New" Label (Always Run This!)
