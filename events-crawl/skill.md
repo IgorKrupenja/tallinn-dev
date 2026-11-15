@@ -74,11 +74,12 @@ jq -r "$FILTER" "$BOOKMARKS_FILE"
 
 For each bookmark URL, open it in the browser and figure out what's on the page. Don't rely on hardcoded per-site logic — read the snapshot and extract events based on what you see.
 
-**Browser:** use the shared local session `playwright-cli -s=personal` from either agent. It
-reuses the configured persistent profile. Use `goto` to navigate, `snapshot` to inspect, `eval` for
-DOM extraction, `screenshot` for visual checks, `requests`/`request` for network details, and
-`click` or `run-code` for interactions. If a page asks for sign-in, pause and ask Igor to sign in
-through his normal browser; do not switch to a fresh profile.
+**Browser:** use `playwright-cli -s=personal` (Igor's CLAUDE.md), the persistent profile that keeps
+his logins. Use `goto` to navigate, `snapshot` to inspect, `eval` for DOM extraction, `screenshot`
+for visual checks, `requests`/`request` for network details, and `click` or `run-code` for
+interactions. Crawls need logins for Facebook, LinkedIn, Discord and Superhuman Docs. If a page
+asks for sign-in, pause and ask Igor to sign in in that browser's own window (it runs headed):
+signing in to his everyday browser doesn't carry over. Never switch to a fresh profile.
 
 **Collect ALL candidates across ALL sources before presenting to user.**
 
@@ -516,25 +517,34 @@ After all events are added, run the `events-coda` skill to:
 3. Label new events
 4. Add missing links
 
-## Step 10: Commit local state (MANDATORY; never push automatically)
+## Step 10: Commit and push (MANDATORY, always at the very end)
 
-Every crawl changes `events-crawl/state.json` when the user answers the presented batch. Commit
-that state locally after recording the user's answer so declined events stay suppressed on the next
-crawl. Never push unless Igor explicitly authorizes that push.
+**Auto-proceed and do NOT ask.** Igor has standing authorization to commit *and push* this
+skill's own changes at the end of a crawl. He asked for it explicitly, so pushing here is not an
+action that needs confirming.
 
-Run git from the canonical repository root:
+Every crawl mutates `events-crawl/state.json` (the declines recorded in Step 7). That file is the
+whole point of the candidate memory, and an uncommitted or unpushed `state.json` is a silent time
+bomb: the next crawl on another checkout re-offers everything Igor already passed on.
+
+Run git from the repository root, not through a skill symlink (`git -C ~/.claude/skills/...` fails
+with *"pathspec is beyond a symbolic link"*):
 
 ```bash
 cd "${TALLINN_DEV_ROOT:-$HOME/Projects/tallinn-dev}"
-git add events-crawl/state.json
+git add events-crawl/
 git status --short          # sanity-check before committing
 git commit -m "events-crawl: record <N> declines from the <YYYY-MM-DD> crawl"
+git push
 ```
 
-- Commit message convention is `events-crawl: <lowercase imperative summary>` — match the existing log (`git log --oneline -5`).
-- Stage only `events-crawl/state.json`; never use `git add -A`.
+- Commit message convention is `events-crawl: <lowercase imperative summary>`; match the existing
+  log (`git log --oneline -5`).
+- **Stage only `events-crawl/`.** Never `git add -A`; unrelated work in the repo is not yours to
+  commit. If the crawl also changed `events-add/` or `events-coda/`, stage those too, but nothing
+  else.
 - If the working tree has unrelated modified files, leave them alone and say so in the summary.
-- Do not push without explicit authorization for that push.
+- If the push is rejected (someone else pushed first), `git pull --rebase` then push again.
 - Mention the commit hash in the run summary so Igor can find it.
 
 ## Candidate memory — `state.json` schema
@@ -593,7 +603,7 @@ python3 candidates.py unskip state.json "<url or title fragment>"
   `description` and an empty `also_seen_on`. Always check those two fields. See Step 6.
 - **Ending a crawl with `state.json` uncommitted** — the declines silently don't persist for
   anyone else, and the next crawl re-offers events Igor already rejected. Always finish with
-  Step 10 (local commit). Push only after Igor explicitly authorizes that push.
+  Step 10 (commit **and** push); it is authorized, so don't stop to ask.
 - **Running git through an agent-skill symlink** — run git from the canonical repository root:
   `cd "${TALLINN_DEV_ROOT:-$HOME/Projects/tallinn-dev}"`.
 - **Recording declines for a batch he never answered** — an unanswered batch is not a rejection.
