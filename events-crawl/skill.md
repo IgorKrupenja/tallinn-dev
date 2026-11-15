@@ -616,7 +616,7 @@ python3 candidates.py unskip state.json "<url or title fragment>"
   those, so the ban would never fire. Use the `ban` subcommand.
 - **Re-adding a blocked organizer** — check candidates against the blocklist in Step 5 before presenting. The blocked series are recurring, so they resurface on every Eventbrite crawl.
 - **Dismissing sources after a surface-level scan** — e.g. seeing only today's events on Fienta and giving up, or skipping ECB because it looks like a big table. Dig deeper!
-- **Saving snapshot files to the repo root** — use the `.playwright-mcp/` folder for snapshots (Playwright's default), don't save named snapshots to the working directory. If you need to save named snapshots, use `/tmp/` or another temp folder outside the repo.
+- **Saving snapshot files to the repo root** — use the `.playwright-cli/` folder for snapshots (playwright-cli's default, git-ignored), don't save named snapshots to the working directory. If you need to save named snapshots, use `/tmp/` or another temp folder outside the repo.
 - **Forgetting to check next year** on sources like ECB that list events far in advance
 - **Not including URLs in the candidate table** — user needs URLs to review events
 - **Including expensive training/certification courses** as if they were community events

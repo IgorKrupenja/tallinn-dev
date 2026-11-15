@@ -43,7 +43,7 @@ Use this date as reference when parsing event dates. If an event shows "Feb 13" 
 
 ### 1. Extract Full Content
 
-Use the `browser` tool (or `web_fetch` as fallback) to get the full event description.
+Open it in `playwright-cli -s=personal` (or `web_fetch` as fallback) to get the full event description.
 
 **⚠️ Mandatory for Facebook events:**
 
