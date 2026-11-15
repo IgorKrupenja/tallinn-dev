@@ -34,16 +34,33 @@ Required env vars:
 
 The Coda table syncs from Google Calendar, but it does not auto-refresh. You must manually trigger a sync before working with the data.
 
-1. Open the doc **logged in**. Coda is now Superhuman Docs, and opening `coda.io/d/...` directly
-   renders an anonymous view with no Refresh button. Go through the workspace first:
+1. Open the doc **logged in**, in this repo's own browser: the playwright-cli session
+   `tallinn-dev`, whose persistent profile keeps Igor's logins, reached only through the repo's
+   `scripts/browser.ts` and `scripts/tab.ts`. Other chats may be using
+   it, and plain playwright-cli commands act on whichever tab is current, so work in a background
+   tab of your own, under a tag no other chat uses (like `coda-<HHMM>`), and never touch tabs you
+   didn't open. Coda is now Superhuman Docs, and opening `coda.io/d/...` directly renders an
+   anonymous view with no Refresh button. Go through the workspace first:
+   ```bash
+   TALLINN_DEV_ROOT="${TALLINN_DEV_ROOT:-$HOME/Projects/tallinn-dev}"
+   bun "$TALLINN_DEV_ROOT/scripts/browser.ts" list
+   # only if tallinn-dev isn't listed:
+   bun "$TALLINN_DEV_ROOT/scripts/browser.ts" open about:blank --headed
+
+   TAB="$TALLINN_DEV_ROOT/scripts/tab.ts"
+   bun "$TAB" open coda-1830 https://coda.io/docs
+   bun "$TAB" run coda-1830 <<'JS'
+   async (p, env) => {
+     await p.goto('https://docs.superhuman.com/d/Estonia-IT-events_dzkj730WT5a');
+     return await p.locator('body').ariaSnapshot();
+   }
+   JS
    ```
-   playwright-cli -s=personal goto https://coda.io/docs        (opens the configured personal session)
-   playwright-cli -s=personal goto https://docs.superhuman.com/d/Estonia-IT-events_dzkj730WT5a
-   ```
-2. Take a fresh snapshot with `playwright-cli -s=personal snapshot`, then click the exact **Refresh**
-   button reference. If needed, use `playwright-cli -s=personal run-code` with
-   `page.getByRole('button', { name: 'Refresh' })`. If the header shows **Try again** instead
-   (after an error such as "Google Calendar couldn't receive edits from Superhuman Docs"), click
+   `p` is the tab's Playwright Page, and `run` prints what the function returns. Close the tab
+   (`bun "$TAB" close coda-1830`) once the sync below is done.
+2. Find the **Refresh** button in that fresh snapshot and click it in another `run`, with
+   `await p.getByRole('button', { name: 'Refresh' }).click()`. If the header shows **Try again**
+   instead (after an error such as "Google Calendar couldn't receive edits from Superhuman Docs"), click
    that: on 2026-11-07 it ran the pull and the new rows arrived about 40 s later, although the
    error text stayed.
    If the table says "The Google Calendar Pack requires a subscription" and shows **View Pack
@@ -57,11 +74,18 @@ The Coda table syncs from Google Calendar, but it does not auto-refresh. You mus
 
 **Note:** There is no API-based way to trigger this sync — the browser click is the only option.
 
-**The table mirrors Google Calendar.** To remove an event, delete it in the calendar
-(`gog calendar delete "$GOOGLE_CALENDAR_ID" <eventId> --force`; deleting a recurring master
-removes all instances), then Refresh. Never delete rows or set `Archived` through the API to get
-rid of an event: Igor rejected that, because synced rows are driven by the calendar. Step 1's
-archiving of events that already ended is the only `Archived` write.
+**The table mirrors Google Calendar.** To remove an event, delete it in the calendar (deleting a
+recurring master removes all instances), then Refresh:
+
+```bash
+TALLINN_DEV_ROOT="${TALLINN_DEV_ROOT:-$HOME/Projects/tallinn-dev}"
+bun "$TALLINN_DEV_ROOT/scripts/gws.ts" calendar events delete \
+  --params "$(jq -n --arg cal "$GOOGLE_CALENDAR_ID" '{calendarId: $cal, eventId: "<eventId>"}')"
+```
+
+Never delete rows or set `Archived` through the API to get rid of an event: Igor rejected that,
+because synced rows are driven by the calendar. Step 1's archiving of events that already ended is
+the only `Archived` write.
 
 ### 1. Auto-Archive Past Events
 
@@ -158,7 +182,7 @@ format gives no warning. A new option has to be added in the UI: Labels column h
 column* → scroll the select-list settings to the bottom → *Add option* (done for `Hardware` on
 2026-09-13). Playwright gotcha in that panel: the option fields are
 `textarea[placeholder="Add text"]` and `fill()` does not register there. Send one real keystroke
-with `playwright-cli -s=personal run-code` and the locator's `press()` method, then use
+with the locator's `press()` method in your tab (a `tab.ts run`, as in Step 0), then use
 `pressSequentially()` for the rest, then blur and click away to commit
 (Escape discards it). Read the row back after writing a newly added label.
 

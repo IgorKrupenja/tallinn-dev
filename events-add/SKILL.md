@@ -43,7 +43,30 @@ Use this date as reference when parsing event dates. If an event shows "Feb 13" 
 
 ### 1. Extract Full Content
 
-Open it in `playwright-cli -s=personal` (or `web_fetch` as fallback) to get the full event description.
+Open it in this repo's own browser (or use `web_fetch` as fallback) to get the full event
+description. The browser is the playwright-cli session `tallinn-dev`, whose persistent profile
+keeps Igor's logins; reach it only through the repo's
+`scripts/browser.ts` and `scripts/tab.ts`. Other chats may be using it, and plain playwright-cli commands act on
+whichever tab is current, so read the page in a background tab of your own, under a tag no other
+chat uses (like `add-<HHMM>`), and never touch tabs you didn't open:
+
+```bash
+TALLINN_DEV_ROOT="${TALLINN_DEV_ROOT:-$HOME/Projects/tallinn-dev}"
+bun "$TALLINN_DEV_ROOT/scripts/browser.ts" list
+# only if tallinn-dev isn't listed:
+bun "$TALLINN_DEV_ROOT/scripts/browser.ts" open about:blank --headed
+
+TAB="$TALLINN_DEV_ROOT/scripts/tab.ts"
+bun "$TAB" open add-1830 "<event url>"
+bun "$TAB" run add-1830 <<'JS'
+async (p, env) => {
+  return await p.locator('body').innerText();
+}
+JS
+bun "$TAB" close add-1830
+```
+
+`p` is the tab's Playwright Page, and `run` prints what the function returns.
 
 **⚠️ Mandatory for Facebook events:**
 
@@ -85,13 +108,14 @@ Fetch existing events for the date range:
 ```bash
 # Fetch events for the specific date
 # IMPORTANT: Use RFC3339 format with timezone, NOT date-only format
-gog calendar list "$GOOGLE_CALENDAR_ID" \
-  --from "YYYY-MM-DDT00:00:00+02:00" \
-  --to "YYYY-MM-DDT23:59:59+02:00" \
-  --json
+TALLINN_DEV_ROOT="${TALLINN_DEV_ROOT:-$HOME/Projects/tallinn-dev}"
+bun "$TALLINN_DEV_ROOT/scripts/gws.ts" calendar events list \
+  --params "$(jq -n --arg cal "$GOOGLE_CALENDAR_ID" '{calendarId: $cal,
+    timeMin: "YYYY-MM-DDT00:00:00+02:00", timeMax: "YYYY-MM-DDT23:59:59+02:00",
+    singleEvents: true, orderBy: "startTime"}')"
 ```
 
-**Note:** Date-only format (`YYYY-MM-DD`) does NOT work and returns zero results. Always use RFC3339 with timezone.
+The events are in the output's `items`. **Note:** Date-only format (`YYYY-MM-DD`) does NOT work: it fails with `400 Bad Request`. Always use RFC3339 with timezone.
 
 **Compare by:**
 
@@ -110,7 +134,7 @@ gog calendar list "$GOOGLE_CALENDAR_ID" \
 
 ### 5. Create Calendar Entry
 
-Use `gog calendar create` with these requirements:
+Use `gws calendar +insert` with these requirements:
 
 **Target Calendar:** MUST use `$GOOGLE_CALENDAR_ID`
 
@@ -127,17 +151,21 @@ The first line MUST be the event URL, followed by an empty line, then the full d
 ### 6. Command Template
 
 ```bash
-gog calendar create "$GOOGLE_CALENDAR_ID" \
+TALLINN_DEV_ROOT="${TALLINN_DEV_ROOT:-$HOME/Projects/tallinn-dev}"
+bun "$TALLINN_DEV_ROOT/scripts/gws.ts" calendar +insert \
+  --calendar "$GOOGLE_CALENDAR_ID" \
   --summary "Event Title" \
-  --from "YYYY-MM-DDTHH:MM:SS+02:00" \
-  --to "YYYY-MM-DDTHH:MM:SS+02:00" \
+  --start "YYYY-MM-DDTHH:MM:SS+02:00" \
+  --end "YYYY-MM-DDTHH:MM:SS+02:00" \
   --location "Full resolved address" \
   --description "https://event-url.com
 
 Full event description text here..."
 ```
 
-**⚠️ Date format also applies to `create`:** `--from` and `--to` MUST use RFC3339 with timezone (e.g. `2027-03-01T09:00:00+02:00`). Date-only format (`2027-03-01`) returns `Google API error (400 badRequest): Bad Request`. For all-day or multi-day events, pick reasonable start/end times (e.g. `09:00:00`–`18:00:00` on the appropriate days).
+It prints the new event as JSON. Add `--dry-run` to see the request without creating anything.
+
+**⚠️ Date format also applies to `+insert`:** `--start` and `--end` MUST use RFC3339 with timezone (e.g. `2027-03-01T09:00:00+02:00`). Date-only format (`2027-03-01`) is sent as a time and fails with `400 Bad Request`. For all-day or multi-day events, pick reasonable start/end times (e.g. `09:00:00` to `18:00:00` on the appropriate days).
 
 **⚠️ The `+02:00` in these templates is winter time.** Estonia is UTC+3 from the last Sunday of
 March to the last Sunday of October. Use the offset of the event's own date: in 2026,
@@ -164,8 +192,8 @@ Before creating the event:
 
 ❌ **NOT CHECKING CURRENT DATE FIRST** — always run `date` first to avoid year errors!
 ❌ Not checking for duplicates before adding
-❌ Using date-only format (YYYY-MM-DD) in duplicate check — returns zero results!
-❌ Using date-only format (YYYY-MM-DD) in `gog calendar create --from/--to` — fails with 400 Bad Request!
+❌ Using date-only format (YYYY-MM-DD) in the duplicate check: fails with 400 Bad Request!
+❌ Using date-only format (YYYY-MM-DD) in `gws calendar +insert --start/--end`: fails with 400 Bad Request!
 ❌ Forgetting to click "See more" on Facebook
 ❌ Summarizing or shortening the description
 ❌ Translating the content

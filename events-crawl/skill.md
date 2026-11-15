@@ -56,30 +56,54 @@ this file. If `state.json` is missing, create it from `state.example.json`.
 `$BOOKMARKS_FOLDER` is a `/`-separated path of folder names (e.g. `talllinn.dev/Sources`). Walk into each folder by name:
 
 ```bash
-# Build jq filter dynamically from BOOKMARKS_FOLDER (e.g. "talllinn.dev/Sources")
-FILTER=$(python3 -c "
-import os
-folders = os.environ['BOOKMARKS_FOLDER'].split('/')
-f = '.roots.bookmark_bar.children[]'
-for folder in folders:
-    f += f' | select(.name == \"{folder}\") | .children[]'
-f += ' | .url'
-print(f)
-")
-
-jq -r "$FILTER" "$BOOKMARKS_FILE"
+# Walk into each folder of BOOKMARKS_FOLDER (e.g. "talllinn.dev/Sources") by name, then list its URLs
+jq -r --arg folders "$BOOKMARKS_FOLDER" '
+  def into($names): if $names == [] then . else .children[] | select(.name == $names[0]) | into($names[1:]) end;
+  .roots.bookmark_bar | into($folders | split("/")) | .children[] | .url
+' "$BOOKMARKS_FILE"
 ```
 
 ## Step 2: Crawl Each Source
 
 For each bookmark URL, open it in the browser and figure out what's on the page. Don't rely on hardcoded per-site logic — read the snapshot and extract events based on what you see.
 
-**Browser:** use `playwright-cli -s=personal` (Igor's CLAUDE.md), the persistent profile that keeps
-his logins. Use `goto` to navigate, `snapshot` to inspect, `eval` for DOM extraction, `screenshot`
-for visual checks, `requests`/`request` for network details, and `click` or `run-code` for
-interactions. Crawls need logins for Facebook, LinkedIn, Discord and Superhuman Docs. If a page
-asks for sign-in, pause and ask Igor to sign in in that browser's own window (it runs headed):
-signing in to his everyday browser doesn't carry over. Never switch to a fresh profile.
+**Browser:** use this repo's own browser, the playwright-cli session `tallinn-dev`, whose
+persistent profile keeps Igor's logins. Reach it only through the repo's `scripts/browser.ts` and
+`scripts/tab.ts`, never through a `playwright-cli` on PATH. Check
+that it's open, and start it if `tallinn-dev` isn't listed:
+
+```bash
+TALLINN_DEV_ROOT="${TALLINN_DEV_ROOT:-$HOME/Projects/tallinn-dev}"
+bun "$TALLINN_DEV_ROOT/scripts/browser.ts" list
+# only if tallinn-dev isn't listed:
+bun "$TALLINN_DEV_ROOT/scripts/browser.ts" open about:blank --headed
+```
+
+Other chats may be using the same browser, and plain playwright-cli commands (`goto`, `snapshot`,
+`click`, `eval`) act on whichever tab is current, so do all page work in a background tab of your
+own and never touch tabs you didn't open. Pick a tag no other chat uses, like `crawl-<HHMM>`, and
+keep that one tab for the whole crawl:
+
+```bash
+TAB="${TALLINN_DEV_ROOT:-$HOME/Projects/tallinn-dev}/scripts/tab.ts"
+bun "$TAB" open crawl-1830 "<source url>"
+bun "$TAB" run crawl-1830 <<'JS'
+async (p, env) => {
+  return await p.locator('body').ariaSnapshot();
+}
+JS
+bun "$TAB" close crawl-1830   # at the end of the crawl
+```
+
+`p` is the tab's Playwright Page, and `run` prints what the function returns: `p.goto(url)` moves
+on to the next source, `p.locator('body').ariaSnapshot()` is a snapshot, `p.evaluate(...)` runs DOM
+extraction, `p.screenshot({ path: env.shots + '/<name>.png' })` saves a screenshot for a visual
+check, and locators click. For network details, catch the request while the page loads:
+`const [req] = await Promise.all([p.waitForRequest(/<url pattern>/), p.reload()])`.
+
+Crawls need logins for Facebook, LinkedIn, Discord and Superhuman Docs. If a page asks for
+sign-in, pause and ask Igor to sign in in that browser's own window (it runs headed): signing in
+to his everyday browser doesn't carry over. Never switch to a fresh profile.
 
 **Collect ALL candidates across ALL sources before presenting to user.**
 
@@ -140,8 +164,8 @@ candidate = { title, date, url, source_url, location (if available) }
     the button reads `Lae veel üritusi`. About 22 clicks reach three weeks out (~400 cards).
   - The first page only shows today's events
   - Scan all loaded events for tech relevance — tech events are mixed in among cultural ones
-  - Cards are `article.event-card` with the link inside. Save them all to a file with
-    `playwright-cli eval` and scan the titles there instead of reading snapshots.
+  - Cards are `article.event-card` with the link inside. Collect them all with `p.evaluate` in a
+    `tab.ts run`, send its output to a file, and scan the titles there instead of reading snapshots.
   - Series cards say "+ mitu hilisemat aega" and link to `/s/<slug>`. The series HTML has one
     JSON-LD Event block per session (startDate, endDate, per-session url, correct DST offsets).
   - The public API beats clicking: `https://fienta.com/api/v1/public/events?starts_from=YYYY-MM-DD`
@@ -176,7 +200,7 @@ candidate = { title, date, url, source_url, location (if available) }
   cross-check. Group pages with no upcoming events show past ones instead, so check the dates.
 - **Facebook groups/feeds**:
   - Feed content renders as empty `blockquote: Facebook` placeholders in accessibility snapshots.
-    Read post bodies from `[data-ad-preview=message]` with `playwright-cli eval`, on pages and groups
+    Read post bodies from `[data-ad-preview=message]` with `p.evaluate`, on pages and groups
     alike: since Oct 2026 the `innerText` of `[role=feed] > div` is just "Facebook Facebook…".
     Scroll in small steps and collect as you go, because the feed unloads posts. Open groups with
     `?sorting_setting=CHRONOLOGICAL` (the default "Most relevant" order surfaces year-old posts).
@@ -192,14 +216,24 @@ candidate = { title, date, url, source_url, location (if available) }
   - **URL extraction**: event cards in snapshots have truncated titles but include a `link` element with `/url:` — always extract that URL. For feed posts with event links visible only in screenshots, navigate to the post to get the actual URL
 - **LinkedIn feeds**:
   - For company pages with an Events tab, check events first, then also scroll the posts feed
-  - Snapshots generally work better than Facebook, but use `playwright-cli screenshot` if content appears empty
+  - Snapshots generally work better than Facebook, but take a screenshot (`p.screenshot`) if content appears empty
   - Company post pages: split `main.innerText` on `/\nFeed post number \d+\n/` (Oct 2026; the DOM
     has no `data-urn`). Profile activity pages (e.g. `laurikoobas/recent-activity`) split on
     `\nFeed post\n`. Read each post's relative age ("2w", "3mo"): company feeds sort by "Top", not
     by date.
 - **K-space** (`wiki.k-space.ee`):
   - Chaostreffs is a valid recurring event (every Thursday) — check the wiki page to confirm it's still running
-  - Check the calendar's recurring event RRULE and **extend the UNTIL date to ~6 months from today** if needed (use `gog calendar update` with `--rrule` and `--scope all`)
+  - Check the calendar's recurring event RRULE and **extend the UNTIL date to ~6 months from today**
+    if needed. The series' own id is the `recurringEventId` of its dates in a calendar listing
+    (such as the Step 4 dump). Read its rule, then write it back with only `UNTIL` changed;
+    patching the series changes all its dates:
+    ```bash
+    GWS="${TALLINN_DEV_ROOT:-$HOME/Projects/tallinn-dev}/scripts/gws.ts"
+    SERIES=$(jq -n --arg cal "$GOOGLE_CALENDAR_ID" '{calendarId: $cal, eventId: "<recurringEventId>"}')
+    bun "$GWS" calendar events get --params "$SERIES" | jq .recurrence
+    bun "$GWS" calendar events patch --params "$SERIES" \
+      --json '{"recurrence": ["RRULE:FREQ=WEEKLY;UNTIL=20270531T205959Z;INTERVAL=1;BYDAY=TH"]}'
+    ```
   - Also check for one-off events on the events page
   - The wiki's public calendar lists everything, one-offs included:
     `https://calendar.google.com/calendar/ical/m5irb4eke9npgk25nrb4qh41v4@group.calendar.google.com/public/basic.ics`
@@ -213,7 +247,7 @@ candidate = { title, date, url, source_url, location (if available) }
   `https://calendar.google.com/calendar/ical/estban.ee_qes79fn8gr41vas5j6cdtptfps%40group.calendar.google.com/public/basic.ics`
 - **Discord**: accessibility snapshots render poorly, but DOM extraction works.
   - Each message is `li[id^="chat-messages-"]` with `time[datetime]` and `[id^="message-content-"]`,
-    so `playwright-cli eval` gives exact timestamps. Screenshots are the fallback.
+    so `p.evaluate` gives exact timestamps. Screenshots are the fallback.
   - **Newest messages are at the BOTTOM.** Set the message scroller's `scrollTop = 0` repeatedly
     to load older posts, until you've seen at least the past month.
   - Server events: click the `div.basicChannelRowLink__*` row that reads "N Event(s)" and read
@@ -237,7 +271,9 @@ candidate = { title, date, url, source_url, location (if available) }
 
   Returns ~100 events with `title`, `start_at`, `venue`, `city`, `source_event_url`,
   `description`, `also_seen_on`. It's a public anon key baked into the page; if it stops working,
-  re-read it from a `rpc/search_events` request in `playwright-cli requests`.
+  re-read it from the page's own `rpc/search_events` request, in a `tab.ts run` on
+  `https://whatwhen.events`:
+  `const [req] = await Promise.all([p.waitForRequest(/rpc\/search_events/), p.reload()]); return req.headers().apikey;`
 
   Two caveats: it lists **online and foreign** events too (filter to in-person Estonia), and its
   records can be **phantom** — see the phantom-events warning in Step 6. Because it aggregates
@@ -257,26 +293,28 @@ This is a known failure mode: after crawling 20+ sources and collecting many can
 
 ## Step 4: Dump the calendar
 
-The calendar is the source of truth for what is already added. Dump it once — Step 5's filter
+The calendar is the source of truth for what is already added. Dump it once: Step 5's filter
 does the actual matching, so there is no separate hand-rolled dedup pass to get wrong:
 
 ```bash
 export TALLINN_DEV_ROOT="${TALLINN_DEV_ROOT:-$HOME/Projects/tallinn-dev}"
 set -a && source "$TALLINN_DEV_ROOT/.env" && set +a
 
-# MUST use --all-pages (default --max is only 10!) and RFC3339 dates with timezone.
+# MUST use --page-all and RFC3339 times with an offset (a bare date is a 400 Bad Request).
+# singleEvents lists every date of a recurring event (Chaostreff) as an entry of its own.
 # Range: today → a few years out, because ECB lists conferences years in advance.
-gog calendar list "$GOOGLE_CALENDAR_ID" \
-  --from "$(date -I)T00:00:00+02:00" \
-  --to "2029-12-31T23:59:59+02:00" \
-  --all-pages --json > /tmp/calendar.json
+bun "$TALLINN_DEV_ROOT/scripts/gws.ts" calendar events list --page-all --page-limit 100 \
+  --params "$(jq -n --arg cal "$GOOGLE_CALENDAR_ID" --arg from "$(date -I)T00:00:00+02:00" \
+    '{calendarId: $cal, timeMin: $from, timeMax: "2029-12-31T23:59:59+02:00",
+      singleEvents: true, orderBy: "startTime", maxResults: 2500}')" > /tmp/calendar.json
 ```
 
-`gog` writes one JSON object per page, so the file may hold several concatenated objects —
-`candidates.py` handles that. Every event created by `events-add` has its URL on the first line
-of the description, which is what makes URL-level matching possible.
+gws writes one JSON object per page, one per line, with the events in `items`; `candidates.ts`
+reads them all. Every event created by `events-add` has its URL on the first line of the
+description, which is what makes URL-level matching possible.
 
-Note `--all-pages` still emits a `nextPageToken`; ignore it, the pages are all there.
+`--page-all` stops after `--page-limit` pages (10 if not given). If the file's last line still has
+a `nextPageToken`, the dump was cut short: raise the limit and dump again.
 
 ## Step 5: Filter
 
@@ -291,7 +329,7 @@ one he was offered and passed on. If he was offered something and did not ask fo
 #   [{ "title": ..., "date": ..., "url": ..., "source_url": ..., "location": ... }]
 # /tmp/calendar.json is the dump from Step 4.
 TALLINN_DEV_ROOT="${TALLINN_DEV_ROOT:-$HOME/Projects/tallinn-dev}"
-python3 "$TALLINN_DEV_ROOT/events-crawl/candidates.py" filter \
+bun "$TALLINN_DEV_ROOT/events-crawl/candidates.ts" filter \
   "$TALLINN_DEV_ROOT/events-crawl/state.json" /tmp/candidates.json /tmp/calendar.json > survivors.json
 ```
 
@@ -380,7 +418,7 @@ again"). A status-code check sails straight past it.
 
 ```bash
 TALLINN_DEV_ROOT="${TALLINN_DEV_ROOT:-$HOME/Projects/tallinn-dev}"
-python3 "$TALLINN_DEV_ROOT/events-crawl/check_links.py" survivors.json
+bun "$TALLINN_DEV_ROOT/events-crawl/check_links.ts" survivors.json
 ```
 
 It flags `soft404-url` / `soft404-body` (dead), `http-4xx`, `tiny-Nb` (suspiciously small page)
@@ -468,7 +506,7 @@ picked counts as declined — silence is a "no", that is the whole point of this
 
 ```bash
 TALLINN_DEV_ROOT="${TALLINN_DEV_ROOT:-$HOME/Projects/tallinn-dev}"
-python3 "$TALLINN_DEV_ROOT/events-crawl/candidates.py" record \
+bun "$TALLINN_DEV_ROOT/events-crawl/candidates.ts" record \
   "$TALLINN_DEV_ROOT/events-crawl/state.json" /tmp/presented.json "add 1 2 5"
 ```
 
@@ -483,14 +521,14 @@ Edge cases:
 - **He replies to only part of the batch, then adds more later** ("also add 5"): run
   `unskip` for that one, then add it normally.
   ```bash
-  python3 candidates.py unskip state.json "https://luma.com/xyz"   # url or title fragment
+  bun candidates.ts unskip state.json "https://luma.com/xyz"   # url or title fragment
   ```
 - **He never answers the batch at all** and asks for something unrelated: do NOT record
   declines — an unanswered batch is not a rejection. Keep `presented.json` and ask next time
   whether to drop it.
 - **He wants a whole recurring series gone** ("stop showing me this", "ban that organizer"):
   ```bash
-  python3 candidates.py ban state.json "The Founders Room" "The Founders Room (paid weekly)" "*"
+  bun candidates.ts ban state.json "The Founders Room" "The Founders Room (paid weekly)" "*"
   ```
   Use the source bookmark URL instead of `*` to scope the ban to one source.
 - **A declined event turns out to be wanted**: `unskip` it. The file is plain JSON — hand-editing
@@ -578,13 +616,13 @@ was added, and mirroring it here would go stale the moment Igor deletes somethin
 `match` must be run through the same `normalize()` the filter uses — the `ban` subcommand does
 this for you, so prefer it over editing by hand.
 
-Helper (`events-crawl/candidates.py`), all four subcommands:
+Helper (`events-crawl/candidates.ts`), all four subcommands:
 
 ```bash
-python3 candidates.py filter state.json candidates.json calendar.json > survivors.json
-python3 candidates.py record state.json presented.json "add 1 2 5"
-python3 candidates.py ban    state.json "<phrase>" "<label>" [source_url|*]
-python3 candidates.py unskip state.json "<url or title fragment>"
+bun candidates.ts filter state.json candidates.json calendar.json > survivors.json
+bun candidates.ts record state.json presented.json "add 1 2 5"
+bun candidates.ts ban    state.json "<phrase>" "<label>" [source_url|*]
+bun candidates.ts unskip state.json "<url or title fragment>"
 ```
 
 ## Common Pitfalls
@@ -595,7 +633,7 @@ python3 candidates.py unskip state.json "<url or title fragment>"
 - **Bolding or highlighting "interesting" rows in the candidate table** — never do this. Emphasis
   with no stated criterion looks like it carries official meaning and just confuses the choice.
   All rows get identical plain formatting; caveats go in the notes below the table. See Step 6.
-- **Presenting a link you never saw resolve** — run `check_links.py` before every batch. Trusting
+- **Presenting a link you never saw resolve**: run `check_links.ts` before every batch. Trusting
   HTTP 200 is not enough: `taltech.ee` soft-404s with a 200 to `/palun-otsi-uuesti`. Igor spotted
   a dead link in the 2026-09-05 batch that a status-code check had passed.
 - **Trusting an aggregator's event without corroboration** — `whatwhen.events` has stored events

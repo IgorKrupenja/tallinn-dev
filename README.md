@@ -1,17 +1,29 @@
 # tallinn-dev
 
-AI agent skills that power [tallinn.dev](https://www.tallinn.dev) — the [Estonia IT events calendar](https://calendar.google.com/calendar/embed?src=9d3f200d21bdcefd62afd208681817ebf5876ec5557ea99d1794fbe3b1f24f2e%40group.calendar.google.com). They crawl bookmarked sources for new events, add them to Google Calendar with full content and resolved venues, and intelligently label them via Coda API.
+AI agent skills that power [tallinn.dev](https://www.tallinn.dev), the [Estonia IT events calendar](https://calendar.google.com/calendar/embed?src=9d3f200d21bdcefd62afd208681817ebf5876ec5557ea99d1794fbe3b1f24f2e%40group.calendar.google.com). They crawl bookmarked sources for new events, add them to Google Calendar with full content and resolved venues, and intelligently label them via Coda API.
 
 Uses the common [Agent Skills](https://agentskills.io/home) format supported by Claude Code, Cursor, Gemini CLI, Codex, OpenClaw and others.
 
 ## Prerequisites
 
-- CLI tools [`gog`](https://gogcli.sh), [`jq`](https://jqlang.org), [`goplaces`](https://github.com/steipete/goplaces).
+- [Bun](https://bun.sh): `curl -fsSL https://bun.sh/install | bash`, or `brew install oven-sh/bun/bun`.
+- [Node.js](https://nodejs.org), which playwright-cli runs on, and [Google Chrome](https://www.google.com/chrome/).
+- CLI tools [`jq`](https://jqlang.org), [`goplaces`](https://github.com/steipete/goplaces) and `curl` (preinstalled on macOS).
 - A Chromium-based browser with a bookmarks folder of event sources.
 
 ## Setup
 
-Run `cp .env.example .env` and fill in your values in the `.env` file.
+1. Run `bun install`. That installs everything else the skills run: [playwright-cli](https://github.com/microsoft/playwright-cli) and [gws](https://github.com/googleworkspace/cli), the Google Workspace CLI.
+2. Run `cp .env.example .env` and fill in your values in the `.env` file. The skills find this repo at `$TALLINN_DEV_ROOT`, `~/Projects/tallinn-dev` by default: if you cloned it somewhere else, set that variable in your shell environment.
+3. Sign gws in once to the Google account that owns the calendar, with Calendar access. It needs an OAuth client (a Desktop app) in `~/.config/gws/client_secret.json`, as the [gws README](https://github.com/googleworkspace/cli) explains:
+
+   ```bash
+   node_modules/.bin/gws auth login --scopes 'openid,https://www.googleapis.com/auth/userinfo.email,https://www.googleapis.com/auth/calendar'
+   ```
+
+4. The skills share one persistent Chrome profile that belongs to this repo: the playwright-cli in `node_modules` names its browser `tallinn-dev` (after the package) and keeps its logins apart from any other playwright-cli on the machine. Start it with `bun scripts/browser.ts open --headed` and sign in to the sources that need it (Facebook, LinkedIn, Luma and so on) once.
+
+The scripts are TypeScript run by Bun, with no other dependencies; `bun run typecheck` checks them. The skills reach the browser through `scripts/browser.ts` (any playwright-cli command) and `scripts/tab.ts` (a background tab per caller, so parallel chats don't collide), and Google Calendar through `scripts/gws.ts`. `events-crawl/candidates.ts` and `check_links.ts` are the crawl's helpers.
 
 ## Skills
 
