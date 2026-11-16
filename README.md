@@ -13,7 +13,7 @@ Uses the common [Agent Skills](https://agentskills.io/home) format supported by 
 
 ## Setup
 
-1. Run `bun install`. That installs everything else the skills run: [skills-kit](https://github.com/IgorKrupenja/skills-kit), with [playwright-cli](https://github.com/microsoft/playwright-cli) and [gws](https://github.com/googleworkspace/cli), the Google Workspace CLI.
+1. Run `bun install`.
 2. Run `cp .env.example .env` and fill in your values in the `.env` file. The skills find this repo at `$TALLINN_DEV_ROOT`, `~/Projects/tallinn-dev` by default: if you cloned it somewhere else, set that variable in your shell environment.
 3. Sign gws in once to the Google account that owns the calendar, with Calendar access. It needs an OAuth client (a Desktop app) in `~/.config/gws/client_secret.json`, as the [gws README](https://github.com/googleworkspace/cli) explains:
 
