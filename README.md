@@ -7,7 +7,7 @@ Uses the common [Agent Skills](https://agentskills.io/home) format supported by 
 ## Prerequisites
 
 - [Bun](https://bun.sh): `curl -fsSL https://bun.sh/install | bash`, or `brew install oven-sh/bun/bun`.
-- [Node.js](https://nodejs.org), which playwright-cli runs on, and [Google Chrome](https://www.google.com/chrome/).
+- [Google Chrome](https://www.google.com/chrome/), for the browser.
 - CLI tools [`jq`](https://jqlang.org), [`goplaces`](https://github.com/steipete/goplaces) and `curl` (preinstalled on macOS).
 - A Chromium-based browser with a bookmarks folder of event sources.
 
@@ -18,7 +18,7 @@ Uses the common [Agent Skills](https://agentskills.io/home) format supported by 
 3. Sign gws in once to the Google account that owns the calendar, with Calendar access. It needs an OAuth client (a Desktop app) in `~/.config/gws/client_secret.json`, as the [gws README](https://github.com/googleworkspace/cli) explains:
 
    ```bash
-   node_modules/.bin/gws auth login --scopes 'openid,https://www.googleapis.com/auth/userinfo.email,https://www.googleapis.com/auth/calendar'
+   bun scripts/gws.ts auth login --scopes 'openid,https://www.googleapis.com/auth/userinfo.email,https://www.googleapis.com/auth/calendar'
    ```
 
 4. The skills share one persistent Chrome profile that belongs to this repo: the playwright-cli in `node_modules` names its browser `tallinn-dev` (after the package) and keeps its logins apart from any other playwright-cli on the machine. Start it with `bun scripts/browser.ts open --headed` and sign in to the sources that need it (Facebook, LinkedIn, Luma and so on) once.

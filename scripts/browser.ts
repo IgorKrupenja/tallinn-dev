@@ -9,7 +9,8 @@
  *
  * The arguments go to playwright-cli as they are, after `-s=<session>` (the session is the repo's
  * package name). `open` also gets `--persistent` and the repo's playwright-cli.json (muted audio,
- * the installed Google Chrome).
+ * the installed Google Chrome). playwright-cli runs on Bun, browser server included, so Node isn't
+ * needed: only the launcher in node_modules/.bin would ask for it.
  *
  *     bun scripts/browser.ts list
  *     bun scripts/browser.ts open https://example.com --headed
@@ -20,7 +21,8 @@
 export const REPO = import.meta.dir.replace(/\/scripts$/, "");
 /** The browser's session name: the repo's package name, so each repo's browser is easy to tell apart. */
 export const SESSION: string = (await Bun.file(`${REPO}/package.json`).json()).name;
-export const CLI = `${REPO}/node_modules/.bin/playwright-cli`;
+/** playwright-cli's entry script, run with this Bun (process.execPath). */
+export const CLI = `${REPO}/node_modules/@playwright/cli/playwright-cli.js`;
 const CONFIG = `${REPO}/playwright-cli.json`;
 
 export function die(message: string): never {
@@ -35,7 +37,7 @@ export async function ensureInstalled(): Promise<void> {
 /** The full playwright-cli command for these arguments, on this repo's browser unless they name a session. */
 export function cliCommand(args: string[], session = SESSION): string[] {
   const named = args.some(a => a === "-s" || a.startsWith("-s=") || a.startsWith("--session"));
-  const command = named ? [CLI, ...args] : [CLI, `-s=${session}`, ...args];
+  const command = [process.execPath, CLI, ...(named ? [] : [`-s=${session}`]), ...args];
   if (args.find(a => !a.startsWith("-")) === "open") {
     if (!args.includes("--persistent") && !args.some(a => a.startsWith("--profile"))) command.push("--persistent");
     if (!args.some(a => a.startsWith("--config"))) command.push(`--config=${CONFIG}`);
