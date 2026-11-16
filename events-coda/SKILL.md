@@ -72,7 +72,7 @@ The Coda table syncs from Google Calendar, but it does not auto-refresh. You mus
    `updatedAt` changes.
 4. Once the sync is complete, proceed to the next steps.
 
-**Note:** There is no API-based way to trigger this sync — the browser click is the only option.
+**Note:** There is no API-based way to trigger this sync: the browser click is the only option.
 
 **The table mirrors Google Calendar.** To remove an event, delete it in the calendar (deleting a
 recurring master removes all instances), then Refresh:

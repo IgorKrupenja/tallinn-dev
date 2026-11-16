@@ -190,7 +190,7 @@ Before creating the event:
 
 ## Common Pitfalls
 
-❌ **NOT CHECKING CURRENT DATE FIRST** — always run `date` first to avoid year errors!
+❌ **NOT CHECKING CURRENT DATE FIRST**: always run `date` first to avoid year errors!
 ❌ Not checking for duplicates before adding
 ❌ Using date-only format (YYYY-MM-DD) in the duplicate check: fails with 400 Bad Request!
 ❌ Using date-only format (YYYY-MM-DD) in `gws calendar +insert --start/--end`: fails with 400 Bad Request!

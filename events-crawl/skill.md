@@ -30,7 +30,7 @@ Required env vars:
 - `$GOOGLE_PLACES_API_KEY` - Google Places API key
 - `$CODA_API_TOKEN`, `$CODA_DOC_ID`, `$CODA_TABLE_ID` - Coda access
 
-Also used: **`events-crawl/state.json`** — the memory of what Igor was offered and passed on, so
+Also used: **`events-crawl/state.json`**, the memory of what Igor was offered and passed on, so
 the same events are never offered twice. What is already *added* is not tracked there; the
 calendar is the source of truth for that. See the **Candidate memory** section near the end of
 this file. If `state.json` is missing, create it from `state.example.json`.
@@ -41,17 +41,17 @@ this file. If `state.json` is missing, create it from `state.example.json`.
 2. Open each source in browser and extract event links/info
 3. Verify ALL sources were crawled (mandatory checkpoint)
 4. Dump the calendar (the source of truth for what is already added)
-5. Filter — one pass drops what is already on the calendar AND what Igor already passed on
+5. Filter: one pass drops what is already on the calendar AND what Igor already passed on
 6. Present ALL survivors in a numbered table
 7. User approves by number
-8. **Record the answer to `state.json`** — everything presented and not picked → `declined`
+8. **Record the answer to `state.json`**: everything presented and not picked → `declined`
 9. Add approved events using `events-add` skill
 10. Update Coda using `events-coda` skill
-11. **Commit and push `state.json`** — always, no asking (Step 10 below)
+11. **Commit and push `state.json`**: always, no asking (Step 10 below)
 
 ## Step 1: Read Bookmarks
 
-**Read fresh each time** — the bookmark list is not static, the user adds/removes sources between runs.
+**Read fresh each time**: the bookmark list is not static, the user adds/removes sources between runs.
 
 `$BOOKMARKS_FOLDER` is a `/`-separated path of folder names (e.g. `talllinn.dev/Sources`). Walk into each folder by name:
 
@@ -65,7 +65,7 @@ jq -r --arg folders "$BOOKMARKS_FOLDER" '
 
 ## Step 2: Crawl Each Source
 
-For each bookmark URL, open it in the browser and figure out what's on the page. Don't rely on hardcoded per-site logic — read the snapshot and extract events based on what you see.
+For each bookmark URL, open it in the browser and figure out what's on the page. Don't rely on hardcoded per-site logic: read the snapshot and extract events based on what you see.
 
 **Browser:** use this repo's own browser, the playwright-cli session `tallinn-dev`, whose
 persistent profile keeps Igor's logins. Reach it only through the repo's `scripts/browser.ts` and
@@ -113,20 +113,20 @@ Keep a running list of candidates:
 candidate = { title, date, url, source_url, location (if available) }
 ```
 
-**Every candidate MUST have a URL.** If you can see an event title/date but don't have a direct link, click into it or extract the href from the snapshot before moving on. A candidate without a URL is incomplete — the user needs URLs to review events and the add-event skill needs them to extract details.
+**Every candidate MUST have a URL.** If you can see an event title/date but don't have a direct link, click into it or extract the href from the snapshot before moving on. A candidate without a URL is incomplete: the user needs URLs to review events and the add-event skill needs them to extract details.
 
 ### General approach for every source
 
-**NEVER skip sources — not even if they feel noisy, time-intensive, or you think you already have enough candidates.** Every source is bookmarked for a reason. If a page requires login, ask the user to log in. If a source requires many clicks or scrolls (Fienta, LinkedIn), do the work — that's the whole point of crawling. "I have 30 candidates already" is NOT a reason to skip remaining sources.
+**NEVER skip sources, not even if they feel noisy, time-intensive, or you think you already have enough candidates.** Every source is bookmarked for a reason. If a page requires login, ask the user to log in. If a source requires many clicks or scrolls (Fienta, LinkedIn), do the work: that's the whole point of crawling. "I have 30 candidates already" is NOT a reason to skip remaining sources.
 
 1. Navigate to the URL in browser
 2. Handle cookie banners / popups (dismiss them)
 3. Take a snapshot
 4. Look for event listings: titles with dates, links to event detail pages
-5. Extract future events — ignore past ones
+5. Extract future events and ignore past ones
 6. If the page has pagination or "load more", scroll/click to get more (see limits below)
-7. **Don't dismiss posts based on post age** — a post from weeks ago may promote an event that's still in the future. Always check the actual event date, not the post/publish date. Click through to the event link if the date isn't clear from the post itself.
-8. **Scroll feeds deeply** — for any feed-style page (FB pages, LinkedIn, groups), scroll **at least 5 times** before moving on. Events are often 3-4 posts down, not at the top. Don't stop after seeing just the first 1-2 posts.
+7. **Don't dismiss posts based on post age**: a post from weeks ago may promote an event that's still in the future. Always check the actual event date, not the post/publish date. Click through to the event link if the date isn't clear from the post itself.
+8. **Scroll feeds deeply**: for any feed-style page (FB pages, LinkedIn, groups), scroll **at least 5 times** before moving on. Events are often 3-4 posts down, not at the top. Don't stop after seeing just the first 1-2 posts.
 9. **When unsure if an event fits, open its detail page** to investigate before excluding it.
 10. **Paid conferences are fine** if they're real community/industry events. Only exclude paid online training courses (e.g. ISTQB certification at €1000+).
 
@@ -136,12 +136,12 @@ candidate = { title, date, url, source_url, location (if available) }
 - Date patterns near link text (e.g., "Mar 26", "26.03.2026", "Thursday 2 April")
 - Event card patterns: heading + date + location grouped together
 - For social feeds (FB groups, LinkedIn posts): scan posts for shared event links
-- **Programs, accelerators, and initiatives** (e.g. "ScaleUP Program", "Incubator Batch") — these often have kickoff events, demo days, pitch nights, or application deadlines with public events attached. Follow the link and check for specific dates/events inside.
-- **Job shadow weeks, career days, and open-door events at tech clusters** (e.g. Ülemiste City, Tehnopol) — these are relevant if they take place in a tech/startup hub where the participating companies are predominantly tech companies. Include them even if the event itself isn't strictly "about" technology.
+- **Programs, accelerators, and initiatives** (e.g. "ScaleUP Program", "Incubator Batch"): these often have kickoff events, demo days, pitch nights, or application deadlines with public events attached. Follow the link and check for specific dates/events inside.
+- **Job shadow weeks, career days, and open-door events at tech clusters** (e.g. Ülemiste City, Tehnopol): these are relevant if they take place in a tech/startup hub where the participating companies are predominantly tech companies. Include them even if the event itself isn't strictly "about" technology.
 
 ### Per-source crawling notes
 
-**IMPORTANT: Do NOT dismiss sources after a surface-level scan. Be thorough — paginate, scroll, and dig into each source.**
+**IMPORTANT: Do NOT dismiss sources after a surface-level scan. Be thorough: paginate, scroll, and dig into each source.**
 
 - **Default**: Extract what's visible on the first page load. If there's a clear "Show more" or pagination, go up to 5 pages deep.
 - **Eventbrite** (`eventbrite.com`):
@@ -155,15 +155,15 @@ candidate = { title, date, url, source_url, location (if available) }
     21:00 start). It is not a local event; leave it out.
 - **ECB** (`ecb.ee/calendar`): Goldmine of tech conferences.
   - Scan the full table for tech keywords (cyber, digital, AI, startup, blockchain, fintech, smart, IoT, cloud, etc.)
-  - **Check ALL future years** in the year dropdown — click the search button to switch years. ECB lists events years in advance (2027, 2028, etc.)
-  - Each table row has a "WWW" column (3rd column) with a direct link to the event website — **always extract that URL**, don't link to the ECB calendar page itself
+  - **Check ALL future years** in the year dropdown: click the search button to switch years. ECB lists events years in advance (2027, 2028, etc.)
+  - Each table row has a "WWW" column (3rd column) with a direct link to the event website: **always extract that URL**, don't link to the ECB calendar page itself
   - curl works for every year: `?filter=1&fyear=2027&fmonth=&fcity=&fvenue=`. The page holds one
     table per month, so parse all of them, not just the first.
 - **Fienta** (`fienta.com`):
   - Click "Load more" **at least 10 times** to see events up to 2 weeks out. The UI is Estonian:
     the button reads `Lae veel üritusi`. About 22 clicks reach three weeks out (~400 cards).
   - The first page only shows today's events
-  - Scan all loaded events for tech relevance — tech events are mixed in among cultural ones
+  - Scan all loaded events for tech relevance: tech events are mixed in among cultural ones
   - Cards are `article.event-card` with the link inside. Collect them all with `p.evaluate` in a
     `tab.ts run`, send its output to a file, and scan the titles there instead of reading snapshots.
   - Series cards say "+ mitu hilisemat aega" and link to `/s/<slug>`. The series HTML has one
@@ -177,10 +177,10 @@ candidate = { title, date, url, source_url, location (if available) }
     returned about 100 Arunädal (Eesti.ai AI week) sessions all over Estonia.
 - **Luma** (`luma.com/tech`, `luma.com/discover`, specific calendars):
   - The 2-week limit applies **only to global/international event listings** (major events, popular calendars)
-  - The **"Nearby Events" section shows local Tallinn events** — extract ALL of them regardless of date, since there are very few
-  - **Nearby Events is lazy-loaded** — after navigating, you MUST `window.scrollTo(0, document.body.scrollHeight)` and wait ~2 seconds before reading the section. On first load `body.innerText` shows just the heading followed immediately by the footer (`"Nearby Events\nDiscoverPricingHelp\nGet the App"`) — that means the cards haven't fetched yet, NOT that there are no local events. Do not treat this as empty.
-  - Nearby events render as `button` elements in snapshots without visible hrefs — **extract the `/url:` from the nested `link` element** (e.g. `/url: /yurdrxp2` → `https://luma.com/yurdrxp2`), or click the button to navigate
-  - For **specific Luma calendars** (e.g. `luma.com/EstoniAI`), extract ALL upcoming events — these pages are small
+  - The **"Nearby Events" section shows local Tallinn events**: extract ALL of them regardless of date, since there are very few
+  - **Nearby Events is lazy-loaded**: after navigating, you MUST `window.scrollTo(0, document.body.scrollHeight)` and wait ~2 seconds before reading the section. On first load `body.innerText` shows just the heading followed immediately by the footer (`"Nearby Events\nDiscoverPricingHelp\nGet the App"`): that means the cards haven't fetched yet, NOT that there are no local events. Do not treat this as empty.
+  - Nearby events render as `button` elements in snapshots without visible hrefs: **extract the `/url:` from the nested `link` element** (e.g. `/url: /yurdrxp2` → `https://luma.com/yurdrxp2`), or click the button to navigate
+  - For **specific Luma calendars** (e.g. `luma.com/EstoniAI`), extract ALL upcoming events: these pages are small
   - The API is faster than the page and needs no auth:
     `https://api.lu.ma/discover/get-paginated-events?latitude=59.437&longitude=24.7536&pagination_limit=50`
     returns every Tallinn-area event (follow `has_more` / `next_cursor`); add
@@ -213,7 +213,7 @@ candidate = { title, date, url, source_url, location (if available) }
   - Page feeds load in a different order on each visit and `innerText` timestamps are obfuscated,
     so the first post is not necessarily the newest. Confirm a post's age from a screenshot when it
     matters.
-  - **URL extraction**: event cards in snapshots have truncated titles but include a `link` element with `/url:` — always extract that URL. For feed posts with event links visible only in screenshots, navigate to the post to get the actual URL
+  - **URL extraction**: event cards in snapshots have truncated titles but include a `link` element with `/url:`. Always extract that URL. For feed posts with event links visible only in screenshots, navigate to the post to get the actual URL
 - **LinkedIn feeds**:
   - For company pages with an Events tab, check events first, then also scroll the posts feed
   - Snapshots generally work better than Facebook, but take a screenshot (`p.screenshot`) if content appears empty
@@ -222,7 +222,7 @@ candidate = { title, date, url, source_url, location (if available) }
     `\nFeed post\n`. Read each post's relative age ("2w", "3mo"): company feeds sort by "Top", not
     by date.
 - **K-space** (`wiki.k-space.ee`):
-  - Chaostreffs is a valid recurring event (every Thursday) — check the wiki page to confirm it's still running
+  - Chaostreffs is a valid recurring event (every Thursday): check the wiki page to confirm it's still running
   - Check the calendar's recurring event RRULE and **extend the UNTIL date to ~6 months from today**
     if needed. The series' own id is the `recurringEventId` of its dates in a calendar listing
     (such as the Step 4 dump). Read its rule, then write it back with only `UNTIL` changed;
@@ -256,7 +256,7 @@ candidate = { title, date, url, source_url, location (if available) }
     of the original post (2026-09-28). Re-read the message behind every calendar entry that came
     from Discord, and move the entry when its date changed.
   - If a message mentions an event elsewhere, **navigate to the linked URL to confirm details**.
-- **WhatWhen** (`whatwhen.events`): the highest-yield single source — an Estonian tech-event
+- **WhatWhen** (`whatwhen.events`): the highest-yield single source, an Estonian tech-event
   aggregator that pulls from Fienta, Luma, Meetup, Eventbrite, Tehnopol, TalTech,
   inkubaator.tallinn.ee and more. Cards are clickable `div`s with **no `href`**, so scraping the
   DOM gets you nothing. Hit its Supabase API instead and get every event in one request:
@@ -276,7 +276,7 @@ candidate = { title, date, url, source_url, location (if available) }
   `const [req] = await Promise.all([p.waitForRequest(/rpc\/search_events/), p.reload()]); return req.headers().apikey;`
 
   Two caveats: it lists **online and foreign** events too (filter to in-person Estonia), and its
-  records can be **phantom** — see the phantom-events warning in Step 6. Because it aggregates
+  records can be **phantom**: see the phantom-events warning in Step 6. Because it aggregates
   sources you also crawl directly, expect heavy overlap; that overlap is useful corroboration.
 
   It also stamps `inkubaator.tallinn.ee` events with a **placeholder date** (the 1st of the month,
@@ -287,7 +287,7 @@ candidate = { title, date, url, source_url, location (if available) }
 
 ## Step 3: Verify ALL Sources Were Crawled
 
-**STOP and check before proceeding.** Go through the full bookmark list from Step 1 and confirm every single URL was visited. If ANY source was skipped — for any reason (felt noisy, seemed time-intensive, "enough candidates already", context getting long) — go back and crawl it NOW before moving on.
+**STOP and check before proceeding.** Go through the full bookmark list from Step 1 and confirm every single URL was visited. If ANY source was skipped, for any reason (felt noisy, seemed time-intensive, "enough candidates already", context getting long), go back and crawl it NOW before moving on.
 
 This is a known failure mode: after crawling 20+ sources and collecting many candidates, there is a strong temptation to skip the remaining "hard" sources (Fienta with 10+ load-more clicks, LinkedIn feeds, Discord). These are exactly the sources most likely to have unique events not found elsewhere. Do not proceed to deduplication until every source has been visited.
 
@@ -318,9 +318,9 @@ a `nextPageToken`, the dump was cut short: raise the limit and dump again.
 
 ## Step 5: Filter
 
-### Candidate memory — run this FIRST, before any human judgement
+### Candidate memory: run this FIRST, before any human judgement
 
-**Igor should never be shown the same event twice** — neither one already on the calendar, nor
+**Igor should never be shown the same event twice**: neither one already on the calendar, nor
 one he was offered and passed on. If he was offered something and did not ask for it, that is a
 "no" and it must never resurface. Don't re-derive the logic, run the helper:
 
@@ -338,7 +338,7 @@ survivors as JSON on stdout. **Present only the survivors.** Mention the hidden 
 summary (e.g. "26 suppressed: 4 already on calendar, 22 previously declined") so the filter is
 visible, never silent.
 
-**The calendar is the source of truth for what is already added** — `state.json` does NOT mirror
+**The calendar is the source of truth for what is already added**: `state.json` does NOT mirror
 it. Every event written by `events-add` carries its URL on the first line of the description, so
 the calendar is a complete URL index (verified: 231/231 non-Chaostreff events). This matters:
 if Igor deletes an event from the calendar it becomes offerable again, which is correct. A
@@ -356,25 +356,25 @@ Matching is deliberately layered, because the same event reappears in different 
 | `banned_series` | `state.json` | whole recurring series / organizers, by title phrase, scoped to one source or `*` |
 
 **The year is part of the key on purpose.** Declining *Cloud Tech Tallinn 2027* must NOT hide
-*Cloud Tech Tallinn 2028* — annual conferences are the norm here. Series bans ignore the year.
+*Cloud Tech Tallinn 2028*: annual conferences are the norm here. Series bans ignore the year.
 
 **Aliases.** Occasionally a source lists an event that IS on the calendar but under a different
-title, date *and* URL, so neither layer matches — e.g. ECB carries a phantom `02.10` row for the
+title, date *and* URL, so neither layer matches: e.g. ECB carries a phantom `02.10` row for the
 Tallinn Design Festival conference that actually runs `01.10`. Record those in `declined` with
 `reason: "duplicate-of-calendar-event"` and a `note` naming the real entry.
 
-### Blocked organizers — hard exclusions
+### Blocked organizers: hard exclusions
 
-**Drop these silently, no matter how tech-relevant they look.** These override "when in doubt, INCLUDE" below — do NOT surface them as candidates for the user to judge.
+**Drop these silently, no matter how tech-relevant they look.** These override "when in doubt, INCLUDE" below: do NOT surface them as candidates for the user to judge.
 
 | Organizer | Identifying markers | Reason |
 | --- | --- | --- |
-| **Tallinn Tech Social** / IT Social | `itsocialevent.com`, Eventbrite organizer "Tallinn Tech Social", socials `@tech.social.event`, titles like "Tallinn Tech Mixer and Social (Tech / AI / Data / IT)" | Reported scam (2026-08-03): sells cheap tickets (€3–5) to events that don't happen. No named organizer, dead WhatsApp/Facebook/Discord channels, fake "5/5 on TrustPilot" badge linking to no reviews, AI-generated blog filler. Reported to Eventbrite by an attendee. Recurring weekly series — will keep reappearing on Eventbrite crawls. |
-| **MUD Events** | Eventbrite organizer "MUD Events" (`eventbrite.com/o/37845888663`), titles like "Business Networking - Startups, Investors & Tech", venue "TECH HUB - Telliskivi 60a/5" | Removed by user request (2026-08-03). Paid-ticket franchise networking: template description reused across cities ("part of a global series hosted in major cities worldwide"), no named host. Not a confirmed scam like the above, but not a real local community event either — don't list it. Recurring weekly series. |
+| **Tallinn Tech Social** / IT Social | `itsocialevent.com`, Eventbrite organizer "Tallinn Tech Social", socials `@tech.social.event`, titles like "Tallinn Tech Mixer and Social (Tech / AI / Data / IT)" | Reported scam (2026-08-03): sells cheap tickets (€3–5) to events that don't happen. No named organizer, dead WhatsApp/Facebook/Discord channels, fake "5/5 on TrustPilot" badge linking to no reviews, AI-generated blog filler. Reported to Eventbrite by an attendee. Recurring weekly series that will keep reappearing on Eventbrite crawls. |
+| **MUD Events** | Eventbrite organizer "MUD Events" (`eventbrite.com/o/37845888663`), titles like "Business Networking - Startups, Investors & Tech", venue "TECH HUB - Telliskivi 60a/5" | Removed by user request (2026-08-03). Paid-ticket franchise networking: template description reused across cities ("part of a global series hosted in major cities worldwide"), no named host. Not a confirmed scam like the above, but not a real local community event either, so don't list it. Recurring weekly series. |
 
 When a blocked organizer's event is found, note it in the run summary as blocked (so the user knows the filter fired) but never add it to the calendar.
 
-**Signals that should make you check an organizer before adding** (not auto-blocks — investigate, and ask the user if unsure):
+**Signals that should make you check an organizer before adding** (not auto-blocks: investigate, and ask the user if unsure):
 
 - Paid ticket for a generic "networking / mixer / social" event with **no named organizer or host** anywhere
 - Franchise-style copy ("part of a global series hosted in major cities worldwide") with a template description reused across cities
@@ -392,9 +392,9 @@ Remove candidates that are NOT IT/tech/startup related. Keep events about:
 - HealthTech, FinTech, EdTech, GreenTech (tech verticals)
 - Blockchain, Web3, crypto
 
-Kids/student tech events (camps, school hackathons) are fine — they get a "student" label in Coda. These are uncommon but valid.
+Kids/student tech events (camps, school hackathons) are fine: they get a "student" label in Coda. These are uncommon but valid.
 
-**Non-public events are also fine** — university seminars, invite-only meetups, career events at tech companies, etc. Many people can have access to these and they're still valuable to list. Don't filter out events just because they seem "internal" or targeted at a specific audience (students, alumni, employees).
+**Non-public events are also fine**: university seminars, invite-only meetups, career events at tech companies, etc. Many people can have access to these and they're still valuable to list. Don't filter out events just because they seem "internal" or targeted at a specific audience (students, alumni, employees).
 
 Remove events about:
 
@@ -403,15 +403,15 @@ Remove events about:
 - Non-tech networking
 - Job fairs that aren't tech-specific
 - **Paid training courses** (e.g. ISTQB certification at €1000+, professional certification programs). Paid conferences (at any price) are fine if they're real community/industry events.
-- **Paid online-only events** listed on Eventbrite or similar — only include in-person or hybrid events in Estonia
+- **Paid online-only events** listed on Eventbrite or similar: only include in-person or hybrid events in Estonia
 
-**When in doubt, INCLUDE the candidate** — the user will make the final call.
+**When in doubt, INCLUDE the candidate**: the user will make the final call.
 
 ## Step 6: Present Candidates
 
 ### Validate every link first (MANDATORY)
 
-**A URL that returns HTTP 200 is NOT proof the event exists.** Several Estonian sites soft-404 —
+**A URL that returns HTTP 200 is NOT proof the event exists.** Several Estonian sites soft-404:
 they serve a "page not found" page *under a 200 status*. `taltech.ee` is the known offender:
 `taltech.ee/events/<slug>` answers 200 and redirects to `/palun-otsi-uuesti` ("please search
 again"). A status-code check sails straight past it.
@@ -428,7 +428,7 @@ and `needs-browser`. Resolve every flag before presenting:
 - **`needs-browser`** (facebook / linkedin / instagram / discord) → **not** broken. These return
   400 to cookie-less curl; confirm them in the logged-in Playwright browser instead.
 - **`tiny-Nb`** → usually a JS-rendered SPA, not an error. Check the `<title>` and
-  `og:description` in the raw HTML — that alone often confirms the event and yields a better
+  `og:description` in the raw HTML: that alone often confirms the event and yields a better
   venue/date than the listing had (this is how MängudeÖÖ's "T1 Venue, 16+ speakers" was found).
 
 **Never present a link you have not seen resolve.** Igor clicks these to review events, and a
@@ -449,7 +449,7 @@ link. The tell-tale shape:
 ```
 
 Three URLs that are the same slug in three different directories, a 404 page's text sitting in
-the `description`, and an empty `also_seen_on` — that event does not exist. Check `description`
+the `description`, and an empty `also_seen_on`: that event does not exist. Check `description`
 and `also_seen_on` on every aggregator-only candidate, and corroborate against a second source
 (the organizer's own site, ECB, Fienta) before presenting. Two such phantoms were caught in the
 2026-09-05 crawl ("Developer Conference 2026", "Startup Workshop"), both attributed to TalTech.
@@ -458,7 +458,7 @@ After ALL sources have been crawled **and every link validated**, present the fu
 as a numbered table.
 
 **NEVER bold, star, highlight or otherwise emphasise individual rows.** Every candidate gets
-identical formatting — plain text, no `**`, no ⭐/🔥, no "(recommended)" annotations, no
+identical formatting: plain text, no `**`, no ⭐/🔥, no "(recommended)" annotations, no
 reordering to put "interesting" ones first. Igor found this actively confusing: emphasis with no
 stated criterion reads like it means something official (already on calendar? higher priority?
 organizer he knows?) when it is really just the model's own hunch. He picks the events; the
@@ -492,17 +492,17 @@ Format:
 
 Then ask: **"Which events to add?"**
 
-**Before asking, save the presented list verbatim** (same order as the numbers shown) — Step 7
+**Before asking, save the presented list verbatim** (same order as the numbers shown): Step 7
 needs it to work out what was ignored:
 
 ```bash
 cp survivors.json /tmp/presented.json
 ```
 
-## Step 7: Record the answer (MANDATORY — do this before adding)
+## Step 7: Record the answer (MANDATORY: do this before adding)
 
 Igor answers by number ("add 1 2 5", "1,4,9 skip others"). Everything presented and **not**
-picked counts as declined — silence is a "no", that is the whole point of this step.
+picked counts as declined: silence is a "no", that is the whole point of this step.
 
 ```bash
 TALLINN_DEV_ROOT="${TALLINN_DEV_ROOT:-$HOME/Projects/tallinn-dev}"
@@ -511,7 +511,7 @@ bun "$TALLINN_DEV_ROOT/events-crawl/candidates.ts" record \
 ```
 
 The rest → `declined` with `reason: "ignored"`. **Approved events are not written to
-`state.json`** — once they land on the calendar in Step 8, the calendar is their record. If an
+`state.json`**: once they land on the calendar in Step 8, the calendar is their record. If an
 add fails, the event correctly shows up again next crawl.
 
 Run this **even if he picks nothing** ("none of these" → all declined).
@@ -524,14 +524,14 @@ Edge cases:
   bun candidates.ts unskip state.json "https://luma.com/xyz"   # url or title fragment
   ```
 - **He never answers the batch at all** and asks for something unrelated: do NOT record
-  declines — an unanswered batch is not a rejection. Keep `presented.json` and ask next time
+  declines: an unanswered batch is not a rejection. Keep `presented.json` and ask next time
   whether to drop it.
 - **He wants a whole recurring series gone** ("stop showing me this", "ban that organizer"):
   ```bash
   bun candidates.ts ban state.json "The Founders Room" "The Founders Room (paid weekly)" "*"
   ```
   Use the source bookmark URL instead of `*` to scope the ban to one source.
-- **A declined event turns out to be wanted**: `unskip` it. The file is plain JSON — hand-editing
+- **A declined event turns out to be wanted**: `unskip` it. The file is plain JSON: hand-editing
   or deleting an entry is perfectly fine.
 
 ## Step 8: Add Approved Events
@@ -585,10 +585,10 @@ git push
 - If the push is rejected (someone else pushed first), `git pull --rebase` then push again.
 - Mention the commit hash in the run summary so Igor can find it.
 
-## Candidate memory — `state.json` schema
+## Candidate memory: `state.json` schema
 
 Lives at `events-crawl/state.json`, next to this file. Committed to git (these are public
-events — no privacy concern, and history makes a bad entry easy to undo). Plain JSON on
+events, so there's no privacy concern, and history makes a bad entry easy to undo). Plain JSON on
 purpose: hand-editing and `git diff` are the recovery tools.
 
 **Two buckets only.** There is deliberately no `added` list: the calendar already records what
@@ -601,7 +601,7 @@ was added, and mirroring it here would go stale the moment Igor deletes somethin
       "reason": "ignored",           // "ignored" = presented and not picked
                                      // "duplicate-of-calendar-event" = alias, see Aliases above
       "declined_at": "2026-08-27",
-      "note": "optional — for aliases, name the real calendar entry" }
+      "note": "optional: for aliases, name the real calendar entry" }
   ],
   "banned_series": [
     { "match": "founders room",      // normalized phrase, matched as substring of the title
@@ -613,7 +613,7 @@ was added, and mirroring it here would go stale the moment Igor deletes somethin
 }
 ```
 
-`match` must be run through the same `normalize()` the filter uses — the `ban` subcommand does
+`match` must be run through the same `normalize()` the filter uses: the `ban` subcommand does
 this for you, so prefer it over editing by hand.
 
 Helper (`events-crawl/candidates.ts`), all four subcommands:
@@ -627,41 +627,41 @@ bun candidates.ts unskip state.json "<url or title fragment>"
 
 ## Common Pitfalls
 
-- **Presenting an event Igor already ignored** — the single biggest annoyance for him. Always run
+- **Presenting an event Igor already ignored**: the single biggest annoyance for him. Always run
   the Step 5 `filter` before presenting, and always run the Step 7 `record` after he answers. If
   `record` is skipped, every ignored event comes back on the next crawl.
-- **Bolding or highlighting "interesting" rows in the candidate table** — never do this. Emphasis
+- **Bolding or highlighting "interesting" rows in the candidate table**: never do this. Emphasis
   with no stated criterion looks like it carries official meaning and just confuses the choice.
   All rows get identical plain formatting; caveats go in the notes below the table. See Step 6.
 - **Presenting a link you never saw resolve**: run `check_links.ts` before every batch. Trusting
   HTTP 200 is not enough: `taltech.ee` soft-404s with a 200 to `/palun-otsi-uuesti`. Igor spotted
   a dead link in the 2026-09-05 batch that a status-code check had passed.
-- **Trusting an aggregator's event without corroboration** — `whatwhen.events` has stored events
+- **Trusting an aggregator's event without corroboration**: `whatwhen.events` has stored events
   whose URL was guessed from a slug pattern, with the fetched 404 page saved as the
   `description` and an empty `also_seen_on`. Always check those two fields. See Step 6.
-- **Ending a crawl with `state.json` uncommitted** — the declines silently don't persist for
+- **Ending a crawl with `state.json` uncommitted**: the declines silently don't persist for
   anyone else, and the next crawl re-offers events Igor already rejected. Always finish with
   Step 10 (commit **and** push); it is authorized, so don't stop to ask.
-- **Running git through an agent-skill symlink** — run git from the canonical repository root:
+- **Running git through an agent-skill symlink**: run git from the canonical repository root:
   `cd "${TALLINN_DEV_ROOT:-$HOME/Projects/tallinn-dev}"`.
-- **Recording declines for a batch he never answered** — an unanswered batch is not a rejection.
+- **Recording declines for a batch he never answered**: an unanswered batch is not a rejection.
   Only `record` once he has actually replied with a selection.
-- **Running `filter` without `calendar.json`** — it only applies `state.json` then, so events
+- **Running `filter` without `calendar.json`**: it only applies `state.json` then, so events
   already on the calendar are offered again. The helper warns on stderr; don't ignore it.
-- **Re-introducing an "added" list** — the calendar is the source of truth for that. A mirror
+- **Re-introducing an "added" list**: the calendar is the source of truth for that. A mirror
   goes stale and would suppress an event Igor deliberately deleted.
-- **Hand-writing a `banned_series` match with digits or punctuation in it** — `normalize()` strips
+- **Hand-writing a `banned_series` match with digits or punctuation in it**: `normalize()` strips
   those, so the ban would never fire. Use the `ban` subcommand.
-- **Re-adding a blocked organizer** — check candidates against the blocklist in Step 5 before presenting. The blocked series are recurring, so they resurface on every Eventbrite crawl.
-- **Dismissing sources after a surface-level scan** — e.g. seeing only today's events on Fienta and giving up, or skipping ECB because it looks like a big table. Dig deeper!
-- **Saving snapshot files to the repo root** — use the `.playwright-cli/` folder for snapshots (playwright-cli's default, git-ignored), don't save named snapshots to the working directory. If you need to save named snapshots, use `/tmp/` or another temp folder outside the repo.
+- **Re-adding a blocked organizer**: check candidates against the blocklist in Step 5 before presenting. The blocked series are recurring, so they resurface on every Eventbrite crawl.
+- **Dismissing sources after a surface-level scan**: e.g. seeing only today's events on Fienta and giving up, or skipping ECB because it looks like a big table. Dig deeper!
+- **Saving snapshot files to the repo root**: use the `.playwright-cli/` folder for snapshots (playwright-cli's default, git-ignored), don't save named snapshots to the working directory. If you need to save named snapshots, use `/tmp/` or another temp folder outside the repo.
 - **Forgetting to check next year** on sources like ECB that list events far in advance
-- **Not including URLs in the candidate table** — user needs URLs to review events
+- **Not including URLs in the candidate table**: user needs URLs to review events
 - **Including expensive training/certification courses** as if they were community events
 - Not processing ALL sources before presenting candidates
 - Including non-tech events (general ticketing sites list everything)
 - Not handling login walls gracefully (skip, don't crash)
-- **Assuming you're not logged in** to LinkedIn/Discord — the browser session is typically already authenticated. Always try navigating first.
+- **Assuming you're not logged in** to LinkedIn/Discord: the browser session is typically already authenticated. Always try navigating first.
 - **Converting UTC times with the summer offset in winter**: Luma's `start_at` is UTC, and Estonia
   drops to UTC+2 on the last Sunday of October. The 2026-09-28 table showed an Oct 27 event at 19:00
   instead of 18:00 because +3 was applied.
