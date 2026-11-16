@@ -23,7 +23,7 @@ Uses the common [Agent Skills](https://agentskills.io/home) format supported by 
 
 4. The skills share one persistent Chrome profile that belongs to this repo: the playwright-cli in `node_modules` names its browser `tallinn-dev` (after the package) and keeps its logins apart from any other playwright-cli on the machine. Start it with `bun node_modules/skills-kit/src/browser.ts open --headed` and sign in to the sources that need it (Facebook, LinkedIn, Luma and so on) once.
 
-The scripts are TypeScript run by Bun; `bun run typecheck` checks them. The skills reach the browser through [skills-kit](https://github.com/IgorKrupenja/skills-kit)'s `browser.ts` (any playwright-cli command) and `tab.ts` (a background tab per caller, so parallel chats don't collide), and Google Calendar through its `gws.ts`. `events-crawl/candidates.ts` and `check_links.ts` are the crawl's helpers.
+The scripts are TypeScript run by Bun; `bun check` type checks and lints them. The skills reach the browser through [skills-kit](https://github.com/IgorKrupenja/skills-kit)'s `browser.ts` (any playwright-cli command) and `tab.ts` (a background tab per caller, so parallel chats don't collide), and Google Calendar through its `gws.ts`. `events-crawl/candidates.ts` and `check_links.ts` are the crawl's helpers.
 
 ## Skills
 

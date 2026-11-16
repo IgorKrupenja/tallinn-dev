@@ -3,12 +3,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "check": "bun check --no-script && bun lint"
   },
   "trustedDependencies": ["@googleworkspace/cli"],
   "devDependencies": {
-    "@types/bun": "^1.4.4",
-    "typescript": "^7.0.2"
+    "@types/bun": "^1.4.4"
   },
   "dependencies": {
     "skills-kit": "github:IgorKrupenja/skills-kit"
