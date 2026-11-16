@@ -30,7 +30,7 @@
 
     "playwright-core": ["playwright-core@1.66.0-alpha-1794252756000", "", { "bin": { "playwright-core": "cli.js" } }, "sha512-AiVQEDLnkpZfEhfXOpqzZA06guT1drbfdcDbV5gePzcr/GdB/9RXnc8FrvV2YNgju0w4JERJllO24n5PmZDQ+A=="],
 
-    "skills-kit": ["skills-kit@github:IgorKrupenja/skills-kit#9a8edce", { "dependencies": { "@googleworkspace/cli": "^0.22.5", "@playwright/cli": "^0.1.24" } }, "IgorKrupenja-skills-kit-9a8edce", "sha512-a4j88bYOIr8Bi0m+tMugs6EshdkQq/Gr3IWetP+GS54g3e04dxirGTbEfatmN8SWZiXH+b1F3RbusW05QBJVWg=="],
+    "skills-kit": ["skills-kit@github:IgorKrupenja/skills-kit#7c5d4ac", { "dependencies": { "@googleworkspace/cli": "^0.22.5", "@playwright/cli": "^0.1.24" } }, "IgorKrupenja-skills-kit-7c5d4ac", "sha512-TLkvkXiadwedaULVzeba/hKG/kS9/+4LUJkDEezg6K6m2zr/MBO84La6PXHbC12eLi1wRVa7ZMsNcVa9ICNjBQ=="],
 
     "undici-types": ["undici-types@8.9.0", "", {}, "sha512-KTDyRTYX8sWmKXAikPHHSyc63CRPETMctyjKFupcC6OBLXT3xsN0e9aF7m+mIXutFWpUXuedtowG7iLOzp0kQg=="],
   }
