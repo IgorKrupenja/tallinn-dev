@@ -94,7 +94,8 @@ bun "$TAB" close add-1830
 If a venue name is provided, resolve it to a full address:
 
 ```bash
-goplaces search "Venue Name" --api-key "$GOOGLE_PLACES_API_KEY" --json
+TALLINN_DEV_ROOT="${TALLINN_DEV_ROOT:-$HOME/Projects/tallinn-dev}"
+bun "$TALLINN_DEV_ROOT/node_modules/skills-kit/src/places.ts" "Venue Name, City"
 ```
 
 Use the `address` field from the result for the calendar event location.
@@ -180,7 +181,7 @@ Before creating the event:
 - ✅ Environment variables sourced
 - ✅ Full content extracted (no truncation)
 - ✅ Original language preserved (no translation)
-- ✅ Location resolved via goplaces (if venue provided)
+- ✅ Location resolved via skills-kit's `places.ts` (if venue provided)
 - ✅ Checked for duplicates in calendar (by date + name)
 - ✅ No duplicate found (if duplicate exists, STOP)
 - ✅ Description starts with URL on first line

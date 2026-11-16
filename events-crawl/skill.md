@@ -540,7 +540,7 @@ For each approved event, use the `events-add` skill flow:
 
 1. Open the event URL in browser
 2. Extract full details (click "See more" on FB, etc.)
-3. Resolve location via goplaces
+3. Resolve location via skills-kit's `places.ts`
 4. Check for duplicates (should be clean but double-check)
 5. Create calendar entry
 

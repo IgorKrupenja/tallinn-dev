@@ -8,7 +8,7 @@ Uses the common [Agent Skills](https://agentskills.io/home) format supported by 
 
 - [Bun](https://bun.sh): `curl -fsSL https://bun.sh/install | bash`, or `brew install oven-sh/bun/bun`.
 - [Google Chrome](https://www.google.com/chrome/), for the browser.
-- CLI tools [`jq`](https://jqlang.org), [`goplaces`](https://github.com/steipete/goplaces) and `curl` (preinstalled on macOS).
+- CLI tools [`jq`](https://jqlang.org) and `curl` (preinstalled on macOS).
 - A Chromium-based browser with a bookmarks folder of event sources.
 
 ## Setup
