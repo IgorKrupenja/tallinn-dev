@@ -36,18 +36,18 @@ The Coda table syncs from Google Calendar, but it does not auto-refresh. You mus
 
 1. Open the doc **logged in**, in this repo's own browser: the playwright-cli session
    `tallinn-dev`, whose persistent profile keeps Igor's logins, reached only through the repo's
-   `scripts/browser.ts` and `scripts/tab.ts`. Other chats may be using
+   `node_modules/skills-kit/browser.ts` and `node_modules/skills-kit/tab.ts`. Other chats may be using
    it, and plain playwright-cli commands act on whichever tab is current, so work in a background
    tab of your own, under a tag no other chat uses (like `coda-<HHMM>`), and never touch tabs you
    didn't open. Coda is now Superhuman Docs, and opening `coda.io/d/...` directly renders an
    anonymous view with no Refresh button. Go through the workspace first:
    ```bash
    TALLINN_DEV_ROOT="${TALLINN_DEV_ROOT:-$HOME/Projects/tallinn-dev}"
-   bun "$TALLINN_DEV_ROOT/scripts/browser.ts" list
+   bun "$TALLINN_DEV_ROOT/node_modules/skills-kit/browser.ts" list
    # only if tallinn-dev isn't listed:
-   bun "$TALLINN_DEV_ROOT/scripts/browser.ts" open about:blank --headed
+   bun "$TALLINN_DEV_ROOT/node_modules/skills-kit/browser.ts" open about:blank --headed
 
-   TAB="$TALLINN_DEV_ROOT/scripts/tab.ts"
+   TAB="$TALLINN_DEV_ROOT/node_modules/skills-kit/tab.ts"
    bun "$TAB" open coda-1830 https://coda.io/docs
    bun "$TAB" run coda-1830 <<'JS'
    async (p, env) => {
@@ -79,7 +79,7 @@ recurring master removes all instances), then Refresh:
 
 ```bash
 TALLINN_DEV_ROOT="${TALLINN_DEV_ROOT:-$HOME/Projects/tallinn-dev}"
-bun "$TALLINN_DEV_ROOT/scripts/gws.ts" calendar events delete \
+bun "$TALLINN_DEV_ROOT/node_modules/skills-kit/gws.ts" calendar events delete \
   --params "$(jq -n --arg cal "$GOOGLE_CALENDAR_ID" '{calendarId: $cal, eventId: "<eventId>"}')"
 ```
 

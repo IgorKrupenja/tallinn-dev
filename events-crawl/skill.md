@@ -68,15 +68,15 @@ jq -r --arg folders "$BOOKMARKS_FOLDER" '
 For each bookmark URL, open it in the browser and figure out what's on the page. Don't rely on hardcoded per-site logic: read the snapshot and extract events based on what you see.
 
 **Browser:** use this repo's own browser, the playwright-cli session `tallinn-dev`, whose
-persistent profile keeps Igor's logins. Reach it only through the repo's `scripts/browser.ts` and
-`scripts/tab.ts`, never through a `playwright-cli` on PATH. Check
+persistent profile keeps Igor's logins. Reach it only through the repo's `node_modules/skills-kit/browser.ts` and
+`node_modules/skills-kit/tab.ts`, never through a `playwright-cli` on PATH. Check
 that it's open, and start it if `tallinn-dev` isn't listed:
 
 ```bash
 TALLINN_DEV_ROOT="${TALLINN_DEV_ROOT:-$HOME/Projects/tallinn-dev}"
-bun "$TALLINN_DEV_ROOT/scripts/browser.ts" list
+bun "$TALLINN_DEV_ROOT/node_modules/skills-kit/browser.ts" list
 # only if tallinn-dev isn't listed:
-bun "$TALLINN_DEV_ROOT/scripts/browser.ts" open about:blank --headed
+bun "$TALLINN_DEV_ROOT/node_modules/skills-kit/browser.ts" open about:blank --headed
 ```
 
 Other chats may be using the same browser, and plain playwright-cli commands (`goto`, `snapshot`,
@@ -85,7 +85,7 @@ own and never touch tabs you didn't open. Pick a tag no other chat uses, like `c
 keep that one tab for the whole crawl:
 
 ```bash
-TAB="${TALLINN_DEV_ROOT:-$HOME/Projects/tallinn-dev}/scripts/tab.ts"
+TAB="${TALLINN_DEV_ROOT:-$HOME/Projects/tallinn-dev}/node_modules/skills-kit/tab.ts"
 bun "$TAB" open crawl-1830 "<source url>"
 bun "$TAB" run crawl-1830 <<'JS'
 async (p, env) => {
@@ -228,7 +228,7 @@ candidate = { title, date, url, source_url, location (if available) }
     (such as the Step 4 dump). Read its rule, then write it back with only `UNTIL` changed;
     patching the series changes all its dates:
     ```bash
-    GWS="${TALLINN_DEV_ROOT:-$HOME/Projects/tallinn-dev}/scripts/gws.ts"
+    GWS="${TALLINN_DEV_ROOT:-$HOME/Projects/tallinn-dev}/node_modules/skills-kit/gws.ts"
     SERIES=$(jq -n --arg cal "$GOOGLE_CALENDAR_ID" '{calendarId: $cal, eventId: "<recurringEventId>"}')
     bun "$GWS" calendar events get --params "$SERIES" | jq .recurrence
     bun "$GWS" calendar events patch --params "$SERIES" \
@@ -303,7 +303,7 @@ set -a && source "$TALLINN_DEV_ROOT/.env" && set +a
 # MUST use --page-all and RFC3339 times with an offset (a bare date is a 400 Bad Request).
 # singleEvents lists every date of a recurring event (Chaostreff) as an entry of its own.
 # Range: today → a few years out, because ECB lists conferences years in advance.
-bun "$TALLINN_DEV_ROOT/scripts/gws.ts" calendar events list --page-all --page-limit 100 \
+bun "$TALLINN_DEV_ROOT/node_modules/skills-kit/gws.ts" calendar events list --page-all --page-limit 100 \
   --params "$(jq -n --arg cal "$GOOGLE_CALENDAR_ID" --arg from "$(date -I)T00:00:00+02:00" \
     '{calendarId: $cal, timeMin: $from, timeMax: "2029-12-31T23:59:59+02:00",
       singleEvents: true, orderBy: "startTime", maxResults: 2500}')" > /tmp/calendar.json

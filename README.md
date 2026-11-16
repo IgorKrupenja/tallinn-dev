@@ -13,17 +13,17 @@ Uses the common [Agent Skills](https://agentskills.io/home) format supported by 
 
 ## Setup
 
-1. Run `bun install`. That installs everything else the skills run: [playwright-cli](https://github.com/microsoft/playwright-cli) and [gws](https://github.com/googleworkspace/cli), the Google Workspace CLI.
+1. Run `bun install`. That installs everything else the skills run: [skills-kit](https://github.com/IgorKrupenja/skills-kit), with [playwright-cli](https://github.com/microsoft/playwright-cli) and [gws](https://github.com/googleworkspace/cli), the Google Workspace CLI.
 2. Run `cp .env.example .env` and fill in your values in the `.env` file. The skills find this repo at `$TALLINN_DEV_ROOT`, `~/Projects/tallinn-dev` by default: if you cloned it somewhere else, set that variable in your shell environment.
 3. Sign gws in once to the Google account that owns the calendar, with Calendar access. It needs an OAuth client (a Desktop app) in `~/.config/gws/client_secret.json`, as the [gws README](https://github.com/googleworkspace/cli) explains:
 
    ```bash
-   bun scripts/gws.ts auth login --scopes 'openid,https://www.googleapis.com/auth/userinfo.email,https://www.googleapis.com/auth/calendar'
+   bun node_modules/skills-kit/gws.ts auth login --scopes 'openid,https://www.googleapis.com/auth/userinfo.email,https://www.googleapis.com/auth/calendar'
    ```
 
-4. The skills share one persistent Chrome profile that belongs to this repo: the playwright-cli in `node_modules` names its browser `tallinn-dev` (after the package) and keeps its logins apart from any other playwright-cli on the machine. Start it with `bun scripts/browser.ts open --headed` and sign in to the sources that need it (Facebook, LinkedIn, Luma and so on) once.
+4. The skills share one persistent Chrome profile that belongs to this repo: the playwright-cli in `node_modules` names its browser `tallinn-dev` (after the package) and keeps its logins apart from any other playwright-cli on the machine. Start it with `bun node_modules/skills-kit/browser.ts open --headed` and sign in to the sources that need it (Facebook, LinkedIn, Luma and so on) once.
 
-The scripts are TypeScript run by Bun, with no other dependencies; `bun run typecheck` checks them. The skills reach the browser through `scripts/browser.ts` (any playwright-cli command) and `scripts/tab.ts` (a background tab per caller, so parallel chats don't collide), and Google Calendar through `scripts/gws.ts`. `events-crawl/candidates.ts` and `check_links.ts` are the crawl's helpers.
+The scripts are TypeScript run by Bun; `bun run typecheck` checks them. The skills reach the browser through [skills-kit](https://github.com/IgorKrupenja/skills-kit)'s `browser.ts` (any playwright-cli command) and `tab.ts` (a background tab per caller, so parallel chats don't collide), and Google Calendar through its `gws.ts`. `events-crawl/candidates.ts` and `check_links.ts` are the crawl's helpers.
 
 ## Skills
 

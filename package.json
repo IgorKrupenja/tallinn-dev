@@ -6,12 +6,11 @@
     "typecheck": "tsc --noEmit"
   },
   "trustedDependencies": ["@googleworkspace/cli"],
-  "dependencies": {
-    "@googleworkspace/cli": "^0.22.5",
-    "@playwright/cli": "^0.1.24"
-  },
   "devDependencies": {
     "@types/bun": "^1.4.4",
     "typescript": "^7.0.2"
+  },
+  "dependencies": {
+    "skills-kit": "github:IgorKrupenja/skills-kit"
   }
 }
