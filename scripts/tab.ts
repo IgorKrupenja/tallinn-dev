@@ -21,12 +21,21 @@
 
 import { $ } from "bun";
 import { parseArgs } from "node:util";
+import type { Page } from "playwright-core";
 import { REPO, SESSION, cliCommand, die, ensureInstalled } from "./browser.ts";
 
 const TAG_RE = /^[A-Za-z0-9._-]{1,80}$/;
 const USAGE = "usage: tab.ts [-s <session>] [--timeout <seconds>] open <tag> <url> | run <tag> [file] | close <tag> | cleanup <prefix>";
 
 type State = { tid: string; url?: string | null; session: string };
+/** What inBrowser() does: open a background tab and load url, run code in tab tid, or close tabs. */
+type BrowserArgs =
+  | { mode: "open"; url: string }
+  | { mode: "run"; tid: string; tag: string; shots: string }
+  | { mode: "close"; tids: string[] };
+/** The caller's code for `run`. */
+type TabCode = (p: Page, env: { shots: string; tag: string }) => Promise<unknown>;
+/** What inBrowser() reports back, as JSON. */
 type Payload = {
   ok?: boolean;
   error?: string | null;
@@ -37,6 +46,77 @@ type Payload = {
   result?: unknown;
   closed?: number;
 };
+
+/**
+ * The part that runs inside playwright-cli's browser server, where `page` is whichever tab is
+ * current. It travels as source text (Bun prints it with the types stripped), so it must not use
+ * anything from outside itself. A tid is Chrome's target id for a tab, which, unlike its URL,
+ * stays the same across navigations.
+ */
+async function inBrowser(page: Page, args: BrowserArgs, code: TabCode | null): Promise<Payload> {
+  const ctx = page.context();
+
+  async function targetId(tab: Page): Promise<string> {
+    const cdp = await ctx.newCDPSession(tab);
+    try {
+      return (await cdp.send("Target.getTargetInfo")).targetInfo.targetId;
+    } finally {
+      await cdp.detach().catch(() => {});
+    }
+  }
+
+  async function findTab(id: string): Promise<Page | null> {
+    for (const tab of ctx.pages()) {
+      try {
+        if ((await targetId(tab)) === id) return tab;
+      } catch {}
+    }
+    return null;
+  }
+
+  if (args.mode === "open") {
+    // ctx.newPage() would open a foreground tab, pulling Chrome in front of the user's other apps.
+    const cdp = await ctx.newCDPSession(page);
+    const { targetId: tid } = await cdp.send("Target.createTarget", { url: "about:blank", background: true });
+    await cdp.detach().catch(() => {});
+    let tab: Page | null = null;
+    for (let i = 0; i < 50 && !tab; i++) {
+      tab = await findTab(tid);
+      if (!tab) await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    if (!tab) return { ok: false, error: "the new background tab did not appear" };
+    try {
+      await tab.goto(args.url, { waitUntil: "domcontentloaded", timeout: 60000 });
+    } catch (e) {
+      return { ok: true, tid, url: tab.url(), warning: String(e).slice(0, 300) };
+    }
+    return { ok: true, tid, url: tab.url(), result: await tab.title() };
+  }
+
+  if (args.mode === "run") {
+    const tab = await findTab(args.tid);
+    if (!tab || !code) return { ok: false, gone: true, error: "tab not found: it was closed" };
+    let result: unknown = null;
+    let error: string | null = null;
+    try {
+      result = await code(tab, { shots: args.shots, tag: args.tag });
+    } catch (e) {
+      error = String((e as { stack?: string } | null)?.stack || e).split("\n").slice(0, 4).join("\n");
+    }
+    await tab.waitForLoadState("domcontentloaded", { timeout: 5000 }).catch(() => {});
+    return { ok: !error, error, tid: args.tid, url: tab.url(), result };
+  }
+
+  let closed = 0;
+  for (const id of args.tids) {
+    const tab = await findTab(id);
+    if (tab) {
+      await tab.close();
+      closed++;
+    }
+  }
+  return { ok: true, closed };
+}
 
 const { values, positionals } = parseArgs({
   args: Bun.argv.slice(2),
@@ -68,14 +148,13 @@ async function removeFile(path: string): Promise<void> {
   await Bun.file(path).delete().catch(() => {});
 }
 
-/** Run tab.js in the browser with these arguments and, in `run` mode, the caller's code. */
-async function runTabJs(args: Record<string, unknown>, body = "null"): Promise<Payload> {
-  // One pass, so placeholder-like text inside the arguments or the body stays as it is. The body
-  // goes on lines of its own, so a trailing `//` comment in it can't swallow the closing bracket.
-  const fills: Record<string, string> = { __ARGS__: JSON.stringify(args), __BODY__: `\n${body}\n` };
-  const template = await Bun.file(`${import.meta.dir}/tab.js`).text();
+/** Run inBrowser() with these arguments and, in `run` mode, the caller's code (source text). */
+async function runInBrowser(args: BrowserArgs, source = "null"): Promise<Payload> {
+  // `run-code` takes one `async page => {...}` function as source. The caller's code goes on lines
+  // of its own, so a trailing `//` comment in it can't swallow the closing bracket.
+  const script = `async page => (${inBrowser.toString()})(page, ${JSON.stringify(args)}, (\n${source}\n))`;
   const scriptPath = `${stateDir}/run-${process.pid}-${Date.now()}.js`;
-  await Bun.write(scriptPath, template.replace(/__ARGS__|__BODY__/g, m => fills[m]!));
+  await Bun.write(scriptPath, script);
   let out: string;
   let err: string;
   let code: number;
@@ -127,7 +206,7 @@ async function main(): Promise<number> {
     const states = await Promise.all(tags.map(loadState));
     const tids = states.flatMap(s => (s ? [s.tid] : []));
     if (tids.length) {
-      const payload = await runTabJs({ mode: "close", tids });
+      const payload = await runInBrowser({ mode: "close", tids });
       console.log(`closed ${payload.closed ?? 0} of ${tids.length} tabs`);
     } else {
       console.log("no tabs to close");
@@ -142,7 +221,7 @@ async function main(): Promise<number> {
   if (cmd === "open") {
     if (!extra) die(USAGE);
     if (await loadState(tag)) die(`tag '${tag}' already has a tab: use run, or close it first`);
-    const payload = await runTabJs({ mode: "open", url: extra });
+    const payload = await runInBrowser({ mode: "open", url: extra });
     if (!payload.ok || !payload.tid) die(payload.error || "could not open a tab");
     await saveState(tag, { tid: payload.tid, url: payload.url, session });
     if (payload.warning) console.error(`tab opened, but loading failed: ${payload.warning}`);
@@ -155,7 +234,7 @@ async function main(): Promise<number> {
   if (!state) die(`no tab for tag '${tag}': open one first`);
 
   if (cmd === "close") {
-    const payload = await runTabJs({ mode: "close", tids: [state.tid] });
+    const payload = await runInBrowser({ mode: "close", tids: [state.tid] });
     await removeFile(statePath(tag));
     console.log(payload.closed ? "closed" : "tab was already gone");
     return 0;
@@ -166,7 +245,7 @@ async function main(): Promise<number> {
   const shots = `${process.cwd()}/.playwright-cli`;
   await $`mkdir -p ${shots}`;
   const body = source.trim().replace(/;+$/, "");
-  const payload = await runTabJs({ mode: "run", tid: state.tid, tag, shots }, body);
+  const payload = await runInBrowser({ mode: "run", tid: state.tid, tag, shots }, body);
   if (payload.gone) {
     await removeFile(statePath(tag));
     die(`the tab for '${tag}' is gone: open a new one`);
