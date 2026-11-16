@@ -46,17 +46,17 @@ Use this date as reference when parsing event dates. If an event shows "Feb 13" 
 Open it in this repo's own browser (or use `web_fetch` as fallback) to get the full event
 description. The browser is the playwright-cli session `tallinn-dev`, whose persistent profile
 keeps Igor's logins; reach it only through the repo's
-`node_modules/skills-kit/browser.ts` and `node_modules/skills-kit/tab.ts`. Other chats may be using it, and plain playwright-cli commands act on
+`node_modules/skills-kit/src/browser.ts` and `node_modules/skills-kit/src/tab.ts`. Other chats may be using it, and plain playwright-cli commands act on
 whichever tab is current, so read the page in a background tab of your own, under a tag no other
 chat uses (like `add-<HHMM>`), and never touch tabs you didn't open:
 
 ```bash
 TALLINN_DEV_ROOT="${TALLINN_DEV_ROOT:-$HOME/Projects/tallinn-dev}"
-bun "$TALLINN_DEV_ROOT/node_modules/skills-kit/browser.ts" list
+bun "$TALLINN_DEV_ROOT/node_modules/skills-kit/src/browser.ts" list
 # only if tallinn-dev isn't listed:
-bun "$TALLINN_DEV_ROOT/node_modules/skills-kit/browser.ts" open about:blank --headed
+bun "$TALLINN_DEV_ROOT/node_modules/skills-kit/src/browser.ts" open about:blank --headed
 
-TAB="$TALLINN_DEV_ROOT/node_modules/skills-kit/tab.ts"
+TAB="$TALLINN_DEV_ROOT/node_modules/skills-kit/src/tab.ts"
 bun "$TAB" open add-1830 "<event url>"
 bun "$TAB" run add-1830 <<'JS'
 async (p, env) => {
@@ -109,7 +109,7 @@ Fetch existing events for the date range:
 # Fetch events for the specific date
 # IMPORTANT: Use RFC3339 format with timezone, NOT date-only format
 TALLINN_DEV_ROOT="${TALLINN_DEV_ROOT:-$HOME/Projects/tallinn-dev}"
-bun "$TALLINN_DEV_ROOT/node_modules/skills-kit/gws.ts" calendar events list \
+bun "$TALLINN_DEV_ROOT/node_modules/skills-kit/src/gws.ts" calendar events list \
   --params "$(jq -n --arg cal "$GOOGLE_CALENDAR_ID" '{calendarId: $cal,
     timeMin: "YYYY-MM-DDT00:00:00+02:00", timeMax: "YYYY-MM-DDT23:59:59+02:00",
     singleEvents: true, orderBy: "startTime"}')"
@@ -152,7 +152,7 @@ The first line MUST be the event URL, followed by an empty line, then the full d
 
 ```bash
 TALLINN_DEV_ROOT="${TALLINN_DEV_ROOT:-$HOME/Projects/tallinn-dev}"
-bun "$TALLINN_DEV_ROOT/node_modules/skills-kit/gws.ts" calendar +insert \
+bun "$TALLINN_DEV_ROOT/node_modules/skills-kit/src/gws.ts" calendar +insert \
   --calendar "$GOOGLE_CALENDAR_ID" \
   --summary "Event Title" \
   --start "YYYY-MM-DDTHH:MM:SS+02:00" \
